@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INF6150 — Séance 2 : Gestion classique de projet logiciel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --card:      #1e2333;
+    --border:    #2a3050;
+    --accent:    #5b8dee;
+    --accent2:   #a78bfa;
+    --accent3:   #34d399;
+    --warn:      #f59e0b;
+    --danger:    #f87171;
+    --text:      #e2e8f0;
+    --muted:     #8492b4;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'IBM Plex Sans', sans-serif;
+    --serif:     'IBM Plex Serif', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d1b3e 0%, #1a1040 50%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 32px 48px;
+    text-align: center;
+  }
+  .hero .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(26px, 5vw, 48px);
+    font-weight: 600;
+    line-height: 1.2;
+    color: #fff;
+    max-width: 820px;
+    margin: 0 auto 16px;
+  }
+  .hero .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 560px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+  .badge-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .badge {
+    background: rgba(91,141,238,.12);
+    border: 1px solid rgba(91,141,238,.3);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    letter-spacing: .06em;
+  }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+
+  /* ── TOC ── */
+  nav.toc {
+    width: 240px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 20px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  nav.toc h2 {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  nav.toc a {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: all .15s;
+    line-height: 1.4;
+  }
+  nav.toc a:hover { color: var(--accent); background: rgba(91,141,238,.08); }
+  nav.toc .toc-sub { padding-left: 16px; font-size: 12px; }
+
+  /* ── MAIN CONTENT ── */
+  main { flex: 1; min-width: 0; padding: 48px 48px 80px; }
+
+  section { margin-bottom: 64px; }
+  section + section { border-top: 1px solid var(--border); padding-top: 64px; }
+
+  h2.section-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2.section-title .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    background: rgba(91,141,238,.12);
+    border: 1px solid rgba(91,141,238,.25);
+    padding: 2px 10px;
+    border-radius: 99px;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 32px 0 12px;
+  }
+  h4 {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent3);
+    margin: 20px 0 8px;
+    letter-spacing: .04em;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+  }
+  .card.accent-l { border-left: 3px solid var(--accent); }
+  .card.accent-g { border-left: 3px solid var(--accent3); }
+  .card.accent-w { border-left: 3px solid var(--warn); }
+  .card.accent-d { border-left: 3px solid var(--danger); }
+  .card.accent-p { border-left: 3px solid var(--accent2); }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── DEFINITION BOX ── */
+  .def {
+    background: rgba(91,141,238,.06);
+    border: 1px solid rgba(91,141,238,.2);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 16px 0;
+  }
+  .def strong { color: var(--accent); }
+
+  /* ── HIGHLIGHT ── */
+  .hl { color: var(--accent); font-weight: 600; }
+  .hl2 { color: var(--accent2); font-weight: 600; }
+  .hl3 { color: var(--accent3); font-weight: 600; }
+  .hlw { color: var(--warn); font-weight: 600; }
+  .hld { color: var(--danger); font-weight: 600; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: rgba(91,141,238,.12);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,48,80,.7);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; margin: 16px 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(42,48,80,.5);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: step;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(91,141,238,.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-num::before { content: counter(step); }
+
+  /* ── GRID ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── PENTAGON VISUAL ── */
+  .pentagon-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 20px 0;
+  }
+  .pentagon-box svg { display: block; margin: 0 auto 24px; }
+  .dim-grid {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 10px;
+    text-align: center;
+  }
+  @media(max-width:680px){ .dim-grid { grid-template-columns: repeat(2,1fr); } }
+  .dim-card {
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  .dim-card .dim-name { font-weight: 700; color: var(--accent2); font-size: 14px; margin-bottom: 6px; }
+  .dim-card p { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.4; }
+
+  /* ── WBS ── */
+  .wbs { font-family: var(--mono); font-size: 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; line-height: 2; }
+  .wbs .root { color: var(--accent); font-weight: 600; }
+  .wbs .l1 { padding-left: 20px; color: var(--accent2); }
+  .wbs .l2 { padding-left: 40px; color: var(--accent3); }
+  .wbs .l3 { padding-left: 60px; color: var(--muted); }
+  .wbs .milestone { color: var(--warn); }
+
+  /* ── RACI ── */
+  .raci-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .raci-R { background: rgba(52,211,153,.15); color: var(--accent3); border: 1px solid var(--accent3); }
+  .raci-A { background: rgba(91,141,238,.15); color: var(--accent); border: 1px solid var(--accent); }
+  .raci-C { background: rgba(167,139,250,.15); color: var(--accent2); border: 1px solid var(--accent2); }
+  .raci-I { background: rgba(245,158,11,.15); color: var(--warn); border: 1px solid var(--warn); }
+
+  /* ── QUIZ ── */
+  .quiz-section { margin-top: 0; }
+  .quiz-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .quiz-q {
+    padding: 18px 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .quiz-q:hover { background: rgba(91,141,238,.06); }
+  .quiz-q .qnum {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--warn);
+    flex-shrink: 0;
+    background: rgba(245,158,11,.1);
+    border: 1px solid rgba(245,158,11,.3);
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+  .quiz-q .arrow { color: var(--muted); flex-shrink: 0; transition: transform .2s; font-size: 18px; }
+  .quiz-q.open .arrow { transform: rotate(180deg); }
+  .quiz-a {
+    display: none;
+    padding: 0 24px 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .quiz-a.show { display: block; }
+  .quiz-a strong { color: var(--accent3); }
+
+  /* ── CODE INLINE ── */
+  code { font-family: var(--mono); background: rgba(91,141,238,.1); color: var(--accent); padding: 1px 6px; border-radius: 4px; font-size: .88em; }
+
+  /* ── FORMULA BOX ── */
+  .formula {
+    background: rgba(52,211,153,.06);
+    border: 1px solid rgba(52,211,153,.25);
+    border-radius: 10px;
+    padding: 16px 22px;
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--accent3);
+    text-align: center;
+    margin: 16px 0;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media(max-width:900px){
+    nav.toc { display: none; }
+    main { padding: 32px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">INF6150 · Gestion de projets logiciels · UQAM</div>
+  <h1>Séance 2 — La gestion classique d'un projet logiciel</h1>
+  <p class="subtitle">Guide d'étude exhaustif : chaque concept expliqué clairement, avec exemples, tableaux et questions d'examen.</p>
+  <div class="badge-row">
+    <span class="badge">Chapitre 2</span>
+    <span class="badge">CMMI · WBS · RACI</span>
+    <span class="badge">Points de Fonction</span>
+    <span class="badge">Diagramme de Gantt</span>
+    <span class="badge">Estimation Delphi</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- TABLE OF CONTENTS -->
+  <nav class="toc">
+    <h2>Contenu</h2>
+    <a href="#intro">2.1 Introduction</a>
+    <a href="#referentiels">Référentiels</a>
+    <a href="#enjeux">2.2 Enjeux & 5 dimensions</a>
+    <a href="#modele">2.3 Modèle d'activités</a>
+    <a href="#planification">2.4 Planification</a>
+    <a class="toc-sub" href="#charte">→ Charte de projet</a>
+    <a class="toc-sub" href="#wbs">→ WBS</a>
+    <a class="toc-sub" href="#raci">→ RACI</a>
+    <a class="toc-sub" href="#estimation">→ Estimation</a>
+    <a class="toc-sub" href="#pf">→ Points de Fonction</a>
+    <a class="toc-sub" href="#livrables">→ Livrables</a>
+    <a class="toc-sub" href="#gantt">→ Gantt</a>
+    <a href="#mesurer">2.5 Mesurer & Contrôler</a>
+    <a href="#fermeture">2.6 Fermeture</a>
+    <a href="#synthese">Synthèse</a>
+    <a href="#quiz">🎯 Questions d'examen</a>
+  </nav>
+
+  <main>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="intro">
+      <h2 class="section-title"><span class="num">2.1</span> Introduction — Les problèmes fréquents</h2>
+
+      <p>Avant de plonger dans les techniques, le cours commence par dresser un portrait honnête de la réalité : <strong>la gestion de projet logiciel est difficile</strong>, et les mêmes problèmes reviennent encore et encore dans l'industrie.</p>
+
+      <div class="grid2">
+        <div class="card accent-d">
+          <div class="card-label">Problème récurrent #1</div>
+          <h4>Planification</h4>
+          <p>On sous-estime le travail à faire. On oublie des tâches. On ne prévoit pas les imprévus. Résultat : le projet prend du retard dès le premier mois.</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Problème récurrent #2</div>
+          <h4>Estimation</h4>
+          <p>Combien de temps faut-il pour développer une fonctionnalité ? C'est très difficile à évaluer. On a tendance à être trop optimiste ("ça prendra 2 jours" → en réalité 2 semaines).</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Problème récurrent #3</div>
+          <h4>Coordination & Contrôle</h4>
+          <p>Comment s'assurer que tout le monde avance dans la même direction ? Que les tâches interdépendantes sont synchronisées ? Sans coordination, le projet part dans tous les sens.</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Problème récurrent #4</div>
+          <h4>Mesure</h4>
+          <p>Comment savoir si on est en retard ou en avance ? Sans mesures objectives (métriques, indicateurs), on navigue à l'aveugle.</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Problème récurrent #5</div>
+          <h4>Communication</h4>
+          <p>Le client veut une chose, l'équipe comprend autre chose, et le gestionnaire dit une troisième chose. La mauvaise communication est la cause #1 d'échec de projet.</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Problème récurrent #6</div>
+          <h4>Gestion des risques</h4>
+          <p>Qu'est-ce qui pourrait mal tourner ? Si on ne l'identifie pas à l'avance, on sera pris par surprise. La gestion des risques, c'est anticiper les problèmes potentiels.</p>
+        </div>
+      </div>
+
+      <div class="card accent-g">
+        <div class="card-label">Pourquoi étudier ça ?</div>
+        <p>Tout l'objet du cours INF6150 est de vous donner des <span class="hl3">outils concrets</span> pour éviter ces pièges. Les techniques vues dans ce chapitre (WBS, RACI, Points de Fonction, Gantt…) existent précisément pour répondre à ces 6 problèmes.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="referentiels">
+      <h2 class="section-title"><span class="num">Réf.</span> Les 3 référentiels à connaître</h2>
+
+      <p>Un <span class="hl">référentiel</span> (ou <em>framework</em>) est un ensemble de bonnes pratiques standardisées. En génie logiciel, trois sont particulièrement importants :</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Référentiel</th><th>Ce qu'il fait</th><th>Analogie simple</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="hl">CMMI</strong><br><small>Capability Maturity Model Integration</small></td>
+              <td>Décrit les <strong>processus de gestion de projets logiciels</strong> selon un niveau de maturité (1 à 5). Plus le niveau est élevé, plus l'organisation est mature et prévisible.</td>
+              <td>C'est comme un guide de bonne conduite pour les organisations : "voici toutes les choses que vous devriez faire, et voici comment évaluer votre niveau."</td>
+            </tr>
+            <tr>
+              <td><strong class="hl">ISO/IEEE 12207</strong></td>
+              <td>Liste <strong>toutes les activités obligatoires et optionnelles</strong> d'un projet de génie logiciel. C'est un inventaire complet de ce qu'on peut faire dans un projet.</td>
+              <td>C'est la liste d'épicerie complète : tout ce dont vous pourriez avoir besoin. À vous de choisir ce qui s'applique à votre projet.</td>
+            </tr>
+            <tr>
+              <td><strong class="hl">ISO/IEEE 16326</strong></td>
+              <td>Présente le <strong>plan de projet normalisé</strong> de l'ingénieur logiciel. C'est un modèle de document officiel.</td>
+              <td>C'est un formulaire officiel pré-rempli qui vous dit exactement quelles sections doit contenir votre plan de projet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Le CMMI — domaine "Planification de Projet" (PP)</h3>
+      <p>Le CMMI organise ses exigences en <span class="hl">Specific Goals (SG)</span> et <span class="hl">Specific Practices (SP)</span>. Pour la planification, il y a 3 SG :</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div>
+            <strong class="hl">SG 1 — Établir les estimations</strong><br>
+            Avant de planifier quoi que ce soit, il faut <em>estimer</em>. Cela inclut : créer un WBS (SP 1.1), estimer la taille des tâches (SP 1.2), définir les phases du cycle de vie (SP 1.3), estimer l'effort et le coût (SP 1.4).
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div>
+            <strong class="hl">SG 2 — Établir et maintenir le plan de projet</strong><br>
+            Créer le plan officiel qui sera la référence pour toute la durée du projet : budget, calendrier (SP 2.1), risques (SP 2.2), données (SP 2.3), ressources (SP 2.4), compétences (SP 2.5), parties prenantes (SP 2.6), plan global (SP 2.7).
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div>
+            <strong class="hl">SG 3 — Obtenir les engagements</strong><br>
+            Un plan ne vaut rien sans l'accord de tout le monde. Il faut revoir tous les plans (SP 3.1), ajuster si nécessaire (SP 3.2), et obtenir la signature/l'engagement des parties prenantes (SP 3.3).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="enjeux">
+      <h2 class="section-title"><span class="num">2.2</span> Les 5 dimensions d'un projet</h2>
+
+      <p>Avant de démarrer un projet, le gestionnaire doit <span class="hl">évaluer la portée et les actifs</span> selon cinq grandes dimensions. Ces cinq dimensions forment un pentagone : toucher à l'une affecte les autres.</p>
+
+      <div class="pentagon-box">
+        <svg viewBox="0 0 260 240" width="260" height="240">
+          <polygon points="130,20 240,90 200,200 60,200 20,90" fill="rgba(91,141,238,0.06)" stroke="rgba(91,141,238,0.4)" stroke-width="2"/>
+          <line x1="130" y1="20" x2="130" y2="110" stroke="rgba(91,141,238,0.2)" stroke-width="1"/>
+          <line x1="240" y1="90" x2="130" y2="110" stroke="rgba(91,141,238,0.2)" stroke-width="1"/>
+          <line x1="200" y1="200" x2="130" y2="110" stroke="rgba(91,141,238,0.2)" stroke-width="1"/>
+          <line x1="60" y1="200" x2="130" y2="110" stroke="rgba(91,141,238,0.2)" stroke-width="1"/>
+          <line x1="20" y1="90" x2="130" y2="110" stroke="rgba(91,141,238,0.2)" stroke-width="1"/>
+          <text x="130" y="14" text-anchor="middle" fill="#a78bfa" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600">Fonctionnalités</text>
+          <text x="252" y="93" text-anchor="start" fill="#34d399" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600">Qualité</text>
+          <text x="205" y="214" text-anchor="middle" fill="#f59e0b" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600">Coût</text>
+          <text x="65" y="214" text-anchor="middle" fill="#f87171" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600">Échéance</text>
+          <text x="0" y="93" text-anchor="start" fill="#5b8dee" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600">Personnel</text>
+        </svg>
+        <div class="dim-grid">
+          <div class="dim-card">
+            <div class="dim-name">Fonctionnalités</div>
+            <p>Qu'est-ce que le logiciel doit faire ? Est-ce complexe ? Peut-on réutiliser du code existant ?</p>
+          </div>
+          <div class="dim-card">
+            <div class="dim-name">Qualité</div>
+            <p>Le logiciel est-il dangereux pour la vie ou l'environnement ? Quel niveau de fiabilité est requis ?</p>
+          </div>
+          <div class="dim-card">
+            <div class="dim-name">Coût</div>
+            <p>Le budget est-il suffisant ? Réaliste par rapport à la portée du projet ?</p>
+          </div>
+          <div class="dim-card">
+            <div class="dim-name">Échéance</div>
+            <p>La date limite est-elle réaliste ? Y a-t-il des enjeux commerciaux ou politiques qui la forcent ?</p>
+          </div>
+          <div class="dim-card">
+            <div class="dim-name">Personnel</div>
+            <p>L'équipe est-elle assez nombreuse ? Connaît-elle le domaine et la technologie ?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card accent-w">
+        <div class="card-label">⚠️ Règle d'or du pentagone</div>
+        <p>Vous ne pouvez pas tout avoir en même temps. Si le client veut <span class="hlw">plus de fonctionnalités</span>, il faut soit <span class="hlw">plus de temps</span>, soit <span class="hlw">plus d'argent</span>, soit <span class="hlw">moins de qualité</span>. C'est la négociation fondamentale de tout projet.</p>
+        <p style="margin-top:10px;"><strong>En mode Agile :</strong> la qualité est <em>non négociable</em> et l'équipe est fixe pour chaque sprint. On négocie plutôt les fonctionnalités.</p>
+      </div>
+
+      <h3>Ce que vous ne contrôlez pas (contraintes)</h3>
+      <p>Le cours insiste sur une réalité souvent oubliée : le gestionnaire n'a pas le contrôle absolu. Voici ce qui s'impose à lui :</p>
+      <div class="card accent-p">
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+          <li>🎯 <strong>Les parties prenantes décident du succès</strong> — peu importe votre opinion, ce sont elles qui jugent si le projet a réussi.</li>
+          <li>👥 <strong>L'équipe vous est souvent imposée</strong> — vous ne choisissez pas toujours vos développeurs.</li>
+          <li>😤 <strong>Impossible de plaire à tout le monde</strong> — les parties prenantes ont des intérêts divergents.</li>
+          <li>📉 <strong>Sans contrôle actif, le projet déraille</strong> — un projet non surveillé prend du retard naturellement.</li>
+          <li>🔄 <strong>Les changements sont inévitables</strong> — il faut prévoir et s'adapter.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="modele">
+      <h2 class="section-title"><span class="num">2.3</span> Modèle d'activités — projet classique</h2>
+
+      <p>Ce modèle montre <strong>comment les activités d'un projet logiciel classique s'interconnectent</strong>. C'est une vue d'ensemble du flux de travail.</p>
+
+      <div class="card accent-l">
+        <div class="card-label">Lecture du modèle</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Activité</th><th>Rôle dans le projet</th><th>Qui est impliqué</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Client</strong></td><td>Fournit les exigences et contraintes du projet</td><td>Client / commanditaire</td></tr>
+              <tr><td><strong>Gestionnaires</strong></td><td>Donnent des directives et contraintes organisationnelles</td><td>Direction, management</td></tr>
+              <tr><td><strong>Planification du projet</strong></td><td>Le cœur : on définit comment on va faire le travail</td><td>Chef de projet</td></tr>
+              <tr><td><strong>Définition des activités</strong></td><td>On découpe le projet en tâches concrètes (→ WBS)</td><td>Chef de projet + équipe</td></tr>
+              <tr><td><strong>Affectations de travail</strong></td><td>On assigne les tâches aux membres de l'équipe</td><td>Chef de projet</td></tr>
+              <tr><td><strong>Activités de développement</strong></td><td>Le vrai travail de coding</td><td>Développeurs</td></tr>
+              <tr><td><strong>Gestion de configuration</strong></td><td>Versionnement, gestion des changements de code</td><td>Équipe technique</td></tr>
+              <tr><td><strong>Activités de tests</strong></td><td>Vérifier que le logiciel fonctionne correctement</td><td>Testeurs / QA</td></tr>
+              <tr><td><strong>AQL (revues/audits)</strong></td><td>Assurance Qualité Logiciel : contrôles formels de qualité</td><td>Équipe qualité</td></tr>
+              <tr><td><strong>Mesurer</strong></td><td>Collecter des données sur l'avancement (métriques)</td><td>Chef de projet</td></tr>
+              <tr><td><strong>Contrôler</strong></td><td>Comparer le réel au planifié, corriger les écarts</td><td>Chef de projet</td></tr>
+              <tr><td><strong>Rapportage</strong></td><td>Communiquer l'état d'avancement au client et à la direction</td><td>Chef de projet</td></tr>
+              <tr><td><strong>Estimation & ré-estimations</strong></td><td>Les estimations s'affinent au fur et à mesure du projet</td><td>Chef de projet + équipe</td></tr>
+              <tr><td><strong>Rétention des données</strong></td><td>Conserver les données historiques pour les projets futurs</td><td>Organisation</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="def">
+        <strong>💡 AQL = Assurance Qualité Logiciel</strong><br>
+        Ce n'est pas juste des tests. L'AQL inclut des <em>revues</em> (inspection de documents, de code) et des <em>audits</em> (vérification que les processus sont bien suivis). C'est une activité indépendante du développement.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="planification">
+      <h2 class="section-title"><span class="num">2.4</span> Les techniques de planification</h2>
+
+      <p>Cette section est le cœur du cours. Elle détaille comment <strong>construire concrètement le plan de projet</strong>, section par section, avec des outils précis.</p>
+
+      <h3>Structure du Plan de Projet (sections standard)</h3>
+      <div class="card accent-l">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Section</th><th>Contenu</th></tr></thead>
+            <tbody>
+              <tr><td><code>2.1</code> Situation actuelle</td><td>Contexte, problématique, forces/faiblesses/menaces</td></tr>
+              <tr><td><code>2.2</code> Objectifs d'affaires</td><td>Pourquoi ce projet existe ? Quels résultats attendus ?</td></tr>
+              <tr><td><code>2.3</code> Description du produit / portée</td><td>Ce que le système doit faire + vue schématique</td></tr>
+              <tr><td><code>2.4</code> Limites du projet</td><td>Ce qui est INCLUS et ce qui est EXCLU</td></tr>
+              <tr><td><code>2.5</code> Structure WBS</td><td>Découpage hiérarchique des tâches</td></tr>
+              <tr><td><code>2.6</code> Livrables</td><td>Liste des documents et produits à remettre</td></tr>
+              <tr><td><code>5</code> Organigramme</td><td>Qui fait quoi ? Hiérarchie de l'équipe</td></tr>
+              <tr><td><code>6</code> Rôles des comités</td><td>CDP et Comité de projet</td></tr>
+              <tr><td><code>7</code> Mécanismes de contrôle</td><td>Rapports d'avancement, gestion des écarts</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CHARTE -->
+      <h3 id="charte">2.4.1 — La Charte de Projet</h3>
+      <div class="card accent-p">
+        <div class="card-label">Définition</div>
+        <p>La <span class="hl2">charte de projet</span> est le document officiel qui autorise formellement le démarrage du projet. Elle représente l'<strong>engagement de l'organisation</strong> à réaliser ce projet.</p>
+        <p style="margin-top:12px;"><strong>Contient :</strong> un premier budget <em>tentatif</em>, un premier calendrier <em>tentatif</em>, les objectifs de haut niveau, le commanditaire (sponsor).</p>
+        <p style="margin-top:8px;"><strong>Processus :</strong> Élaboration (idée → faisabilité) → <em>si approuvé</em> → Planification → Exécution → Clôture.</p>
+      </div>
+
+      <div class="card accent-g">
+        <div class="card-label">Degré de précision des estimations selon la phase</div>
+        <p>Un graphique clé du cours montre que l'incertitude des estimations est <strong>très grande au début</strong> (±200% en avant-projet) et <strong>diminue progressivement</strong> à mesure qu'on avance :</p>
+        <div style="margin-top:12px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:rgba(248,113,113,.12);border:1px solid #f87171;color:#f87171;padding:4px 12px;border-radius:6px;font-size:13px;">Avant-projet : ±200%</span>
+            <span style="background:rgba(245,158,11,.12);border:1px solid #f59e0b;color:#f59e0b;padding:4px 12px;border-radius:6px;font-size:13px;">Exigences : ±50%</span>
+            <span style="background:rgba(167,139,250,.12);border:1px solid #a78bfa;color:#a78bfa;padding:4px 12px;border-radius:6px;font-size:13px;">Conception : ±25%</span>
+            <span style="background:rgba(91,141,238,.12);border:1px solid #5b8dee;color:#5b8dee;padding:4px 12px;border-radius:6px;font-size:13px;">Codage : ±10%</span>
+            <span style="background:rgba(52,211,153,.12);border:1px solid #34d399;color:#34d399;padding:4px 12px;border-radius:6px;font-size:13px;">MEP : ±5%</span>
+          </div>
+        </div>
+        <p style="margin-top:12px;color:var(--muted);font-size:14px;">MEP = Mise En Production. Plus on progresse dans le projet, plus nos estimations deviennent précises, car on a plus d'information.</p>
+      </div>
+
+      <!-- WBS -->
+      <h3 id="wbs">2.4.2 — Le WBS (Work Breakdown Structure)</h3>
+
+      <div class="def">
+        <strong>📐 WBS = Structure de Découpage du Projet</strong><br>
+        C'est une <strong>décomposition hiérarchique du projet en tâches de plus en plus petites</strong>, jusqu'à des unités gérables qu'on peut estimer et assigner. En français, on parle aussi de <em>jalonnement</em>.
+      </div>
+
+      <p>Un <span class="hl">Jalon</span> est un point de contrôle clé dans le projet — une activité associée à une livraison ou à une décision (ex: "Le client approuve les résultats de tests"). Les jalons permettent de mesurer l'avancement.</p>
+
+      <h4>Exemple de WBS — Projet bancaire e-commerce :</h4>
+      <div class="wbs">
+        <div class="root">Projet Bancaire – Commerce Électronique</div>
+        <div class="l1">1.0 Démarrage du Projet</div>
+        <div class="l1">2.0 Planifier le Projet</div>
+        <div class="l1">3.0 Exécuter</div>
+        <div class="l2">3.1 Analyse</div>
+        <div class="l2">3.2 Conception</div>
+        <div class="l2">3.3 Développement (Dév)</div>
+        <div class="l2">3.4 Tests</div>
+        <div class="l3">3.4.1 Plan de Test</div>
+        <div class="l3">3.4.2 Rapport de résultats des tests</div>
+        <div class="l3" style="padding-left:80px;">3.4.2.1 Réviser le plan de test avec le client</div>
+        <div class="l3" style="padding-left:80px;">3.4.2.2 Effectuer les tests</div>
+        <div class="l3" style="padding-left:80px;">3.4.2.3 Analyser les résultats</div>
+        <div class="l3" style="padding-left:80px;">3.4.2.4 Préparer le rapport et la présentation</div>
+        <div class="l3" style="padding-left:80px;">3.4.2.5 Présenter les résultats au client</div>
+        <div class="l3" style="padding-left:80px;">3.4.2.6 Traiter les problèmes/défauts et re-tester</div>
+        <div class="l3 milestone" style="padding-left:80px;">⭐ 3.4.2.7 JALON : Le client approuve les résultats</div>
+        <div class="l2">3.5 Implantation</div>
+        <div class="l1">4.0 Suivi et Contrôle</div>
+        <div class="l1">5.0 Accepter et Finaliser</div>
+        <div class="l1">6.0 Leçons Apprises</div>
+      </div>
+
+      <h4>Les 5 avantages du WBS :</h4>
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">Avantage 1</div>
+          <strong>Meilleure planification</strong>
+          <p>La décomposition facilite l'estimation des durées. On voit tout ce qu'il y a à faire d'un coup d'œil.</p>
+        </div>
+        <div class="card accent-l">
+          <div class="card-label">Avantage 2</div>
+          <strong>Maîtrise du suivi</strong>
+          <p>On peut affecter des jalons, revoir l'articulation des travaux. Savoir précisément où on en est.</p>
+        </div>
+        <div class="card accent-l">
+          <div class="card-label">Avantage 3</div>
+          <strong>Meilleure communication</strong>
+          <p>Tout le monde voit la même chose. Les échanges sont plus clairs, moins d'ambiguïtés.</p>
+        </div>
+        <div class="card accent-l">
+          <div class="card-label">Avantage 4</div>
+          <strong>Meilleure gestion des coûts</strong>
+          <p>L'allocation des ressources est plus précise. On peut construire un budget prévisionnel réaliste.</p>
+        </div>
+        <div class="card accent-l" style="grid-column: 1 / -1;">
+          <div class="card-label">Avantage 5</div>
+          <strong>Meilleure gestion des risques</strong>
+          <p>On identifie les zones critiques du projet (les tâches les plus longues, les plus incertaines) et on peut préparer des scénarios préventifs.</p>
+        </div>
+      </div>
+
+      <!-- RACI -->
+      <h3 id="raci">2.4.3 — La Matrice RACI</h3>
+
+      <div class="def">
+        <strong>📋 RACI = qui fait quoi sur chaque tâche</strong><br>
+        La matrice RACI est un outil qui assigne un rôle précis à chaque personne pour chaque activité du WBS. Elle élimine les zones grises ("je croyais que c'était toi qui faisais ça !").
+      </div>
+
+      <div class="grid2">
+        <div class="card" style="border-left:3px solid var(--accent3);">
+          <span class="raci-badge raci-R">R</span>
+          <strong style="margin-left:10px;color:var(--accent3);">Responsible (Réalisateur)</strong>
+          <p style="margin-top:8px;">La personne qui <strong>fait le travail</strong>. Il peut y en avoir plusieurs par activité.</p>
+          <p style="color:var(--muted);font-size:13px;">Ex: Le développeur qui code la fonctionnalité.</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--accent);">
+          <span class="raci-badge raci-A">A</span>
+          <strong style="margin-left:10px;color:var(--accent);">Accountable (Approbateur)</strong>
+          <p style="margin-top:8px;">La personne qui <strong>approuve et est responsable au final</strong>. Il n'y en a qu'<em>une seule</em> par activité.</p>
+          <p style="color:var(--muted);font-size:13px;">Ex: Le chef de projet qui signe le livrable.</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--accent2);">
+          <span class="raci-badge raci-C">C</span>
+          <strong style="margin-left:10px;color:var(--accent2);">Consulted (Consulté)</strong>
+          <p style="margin-top:8px;">La personne qu'on <strong>consulte avant de décider</strong>. Elle donne son avis mais ne fait pas le travail.</p>
+          <p style="color:var(--muted);font-size:13px;">Ex: L'expert en sécurité consulté pour valider l'approche.</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--warn);">
+          <span class="raci-badge raci-I">I</span>
+          <strong style="margin-left:10px;color:var(--warn);">Informed (Informé)</strong>
+          <p style="margin-top:8px;">La personne qu'on <strong>tient au courant</strong> des décisions prises, sans la consulter.</p>
+          <p style="color:var(--muted);font-size:13px;">Ex: Le directeur informé des résultats de tests.</p>
+        </div>
+      </div>
+
+      <div class="card accent-w">
+        <div class="card-label">💡 Utilité pratique de la RACI</div>
+        <p>La matrice RACI <strong>clarifie le domaine d'intervention de chaque acteur</strong> et évite deux problèmes courants : (1) personne ne s'occupe d'une tâche parce que chacun croyait que l'autre le ferait, (2) tout le monde veut s'impliquer dans tout, créant des conflits.</p>
+      </div>
+
+      <!-- COMITÉS -->
+      <h3>2.4.4 — Représenter le Comité de Projet</h3>
+
+      <p>Un projet a généralement deux niveaux de gouvernance :</p>
+
+      <div class="grid2">
+        <div class="card accent-p">
+          <div class="card-label">Niveau supérieur</div>
+          <strong class="hl2">Comité de Direction de Projet (CDP)</strong>
+          <p style="margin-top:8px;">Composé du VP responsable, du Conseil TI. Rôles :</p>
+          <ul style="margin-top:6px;padding-left:16px;color:var(--muted);font-size:14px;line-height:1.8;">
+            <li>Approuve les objectifs d'affaires</li>
+            <li>Identifie les priorités</li>
+            <li>Décide en cas de risques majeurs (budget, délais, RH)</li>
+            <li>Approuve les changements de portée</li>
+            <li>Approuve la clôture du projet</li>
+          </ul>
+        </div>
+        <div class="card accent-l">
+          <div class="card-label">Niveau opérationnel</div>
+          <strong class="hl">Comité de Projet</strong>
+          <p style="margin-top:8px;">Composé du chef de projet, co-pilote, pilote, responsable TI, analystes. Rôles :</p>
+          <ul style="margin-top:6px;padding-left:16px;color:var(--muted);font-size:14px;line-height:1.8;">
+            <li>Coordonne les efforts du jour au jour</li>
+            <li>Supervise toutes les phases (démarrage → clôture)</li>
+            <li>Escalade les problèmes importants au CDP</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ESTIMATION -->
+      <h3 id="estimation">2.4.5 — Estimer l'effort : 4 techniques</h3>
+
+      <p>L'estimation est peut-être la compétence la plus difficile en gestion de projet. Le cours présente quatre techniques.</p>
+
+      <!-- DELPHI -->
+      <h4>Technique 1 — La méthode Delphi</h4>
+      <div class="card accent-p">
+        <div class="card-label">Principe : consensus d'experts par itérations anonymes</div>
+        <p>Cette technique vient de la Rand Corporation (années 1950). L'idée : éviter que les experts se laissent influencer les uns les autres (biais de conformisme).</p>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div><strong>Présentation</strong> — Le modérateur présente le projet ou la problématique à estimer.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Estimation individuelle</strong> — Chaque expert estime dans son coin, sans se concerter.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Collecte anonyme</strong> — Le modérateur collecte les estimations (anonymement) et calcule la moyenne.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Révélation + discussion</strong> — La moyenne est affichée. Les experts discutent des écarts (pourquoi l'un estime 5j et l'autre 20j ?).</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>2ème tour</strong> — Les experts estiment à nouveau, en tenant compte de la discussion.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Convergence</strong> — On répète jusqu'à ce que les estimations convergent vers un consensus.</div></div>
+        </div>
+        <p style="color:var(--muted);font-size:13px;margin-top:8px;">✅ Avantage : réduit les biais d'autorité. ❌ Inconvénient : prend du temps, nécessite des experts disponibles.</p>
+      </div>
+
+      <!-- DESCENDANTE -->
+      <h4>Technique 2 — L'estimation descendante (Top-Down)</h4>
+      <div class="card accent-l">
+        <div class="card-label">Principe : estimer du global vers le détail</div>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div>Établir l'effort pour un module <strong>Simple / Moyen / Complexe</strong> (ex: simple = 2j, moyen = 5j, complexe = 10j)</div></div>
+          <div class="step"><div class="step-num"></div><div>Classer tous les modules selon leur complexité</div></div>
+          <div class="step"><div class="step-num"></div><div>Additionner l'effort total</div></div>
+          <div class="step"><div class="step-num"></div><div>Multiplier par un <strong>facteur de risque</strong> (ex: ×1.3 si nouvelles technologies)</div></div>
+        </div>
+        <p style="color:var(--muted);font-size:13px;margin-top:8px;">✅ Rapide. ❌ Moins précis, nécessite de l'expérience pour calibrer les catégories.</p>
+      </div>
+
+      <!-- ASCENDANTE -->
+      <h4>Technique 3 — L'estimation ascendante (Bottom-Up)</h4>
+      <div class="card accent-g">
+        <div class="card-label">Principe : estimer tâche par tâche et additionner</div>
+        <p>C'est la technique la plus précise. On prend le WBS détaillé et on assigne une durée en jours à <strong>chaque sous-tâche</strong>.</p>
+        <div class="formula">
+          3.4.2.1 Réviser plan de test → 1j<br>
+          3.4.2.2 Effectuer les tests → 5j<br>
+          3.4.2.3 Analyser les résultats → 2j<br>
+          3.4.2.4 Rapport + présentation → 3j<br>
+          3.4.2.5 Présenter au client → 1j<br>
+          3.4.2.6 Corriger défauts + re-tester → 5j<br>
+          ─────────────────────────<br>
+          Total : 17 jours-personnes
+        </div>
+        <p style="color:var(--muted);font-size:13px;">✅ Très précis. ❌ Long à faire, nécessite un WBS très détaillé.</p>
+      </div>
+
+      <!-- POINTS DE FONCTION -->
+      <h3 id="pf">Technique 4 — Les Points de Fonction (Taille Fonctionnelle)</h3>
+
+      <div class="def">
+        <strong>📏 Point de Fonction = unité de mesure de la taille d'un logiciel</strong><br>
+        Invented by Allan Albrecht (IBM, 1979). L'idée : mesurer ce qu'un logiciel <em>fait</em> (fonctionnalités) plutôt que comment il est <em>fait</em> (lignes de code). Indépendant du langage de programmation.
+      </div>
+
+      <h4>Comprendre la frontière du logiciel</h4>
+      <p>Avant de mesurer, on identifie les <strong>mouvements de données</strong> entre les utilisateurs, le logiciel, et le stockage. Il y a 4 types de mouvements :</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Lettre</th><th>Type</th><th>Direction</th><th>Ce que ça inclut</th><th>Exemple</th></tr></thead>
+          <tbody>
+            <tr><td><strong class="hl2">E</strong></td><td>Entrée (Entry)</td><td>Utilisateur → Logiciel</td><td>Mise en forme, validations, manipulations</td><td>Formulaire de création de compte</td></tr>
+            <tr><td><strong class="hl2">X</strong></td><td>Sortie (eXit)</td><td>Logiciel → Utilisateur</td><td>Formatage, données de sortie, routage</td><td>Affichage d'une liste d'annonces</td></tr>
+            <tr><td><strong class="hl2">R</strong></td><td>Lecture (Read)</td><td>Stockage → Logiciel</td><td>Processus et calculs lors de la lecture</td><td>Récupérer un compte utilisateur</td></tr>
+            <tr><td><strong class="hl2">W</strong></td><td>Écriture (Write)</td><td>Logiciel → Stockage</td><td>Processus et calculs pour conserver</td><td>Sauvegarder une nouvelle annonce</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Démarche en 6 étapes :</h4>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div><strong>Établir les frontières du logiciel</strong> — Qu'est-ce qui est dans le système ? Qu'est-ce qui est à l'extérieur ?</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Identifier les Entrées/Sorties</strong> — Tous les écrans, formulaires, rapports.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Identifier les Mouvements de données</strong> — Les E, X, R, W pour chaque processus fonctionnel.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Additionner les Points de Fonction</strong> — Total = somme de tous les mouvements de tous les processus.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Identifier la productivité en J/P par PF</strong> — Depuis vos données historiques ou une base publique (ex: ISBSG).</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Comparer avec un collègue</strong> — Faire la moyenne des deux estimations.</div></div>
+      </div>
+
+      <h4>Exemple concret (projet d'annonces en ligne) :</h4>
+      <div class="card accent-g">
+        <p>Le modèle de données identifie <strong>5 groupes de données</strong> (Annonce, Catégorie, Région, User, AnnoncePhoto). Les cas d'utilisation identifient <strong>17 processus fonctionnels</strong> (créer compte, modifier compte, ajouter annonce, rechercher, etc.)</p>
+        <div class="formula">74 Points de Fonction × 8 heures/PF = <strong>592 heures</strong> estimées</div>
+        <p style="color:var(--muted);font-size:13px;">Le chiffre 8h/PF vient des données historiques de l'organisation ou de la base ISBSG (International Software Benchmarking Standards Group).</p>
+      </div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead><tr><th>Processus Fonctionnel</th><th>E</th><th>R</th><th>W</th><th>X</th><th>Total PF</th></tr></thead>
+          <tbody>
+            <tr><td>1-Créer un compte utilisateur</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td></tr>
+            <tr><td>2-Modifier un compte utilisateur</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td></tr>
+            <tr><td>3-Supprimer un compte utilisateur</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td></tr>
+            <tr><td>4-Lire les comptes utilisateurs</td><td>1</td><td>1</td><td>—</td><td>2</td><td>4</td></tr>
+            <tr><td>... (13 autres processus) ...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+            <tr><td>17-Rechercher annonces (multi-critères)</td><td>3</td><td>3</td><td>—</td><td>4</td><td>10</td></tr>
+            <tr style="font-weight:700;"><td><strong>TOTAL</strong></td><td>19</td><td>19</td><td>12</td><td>24</td><td><strong class="hl3">74 PF</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LIVRABLES -->
+      <h3 id="livrables">2.4.6 — Lister les Livrables Techniques et de Gestion</h3>
+
+      <div class="def">
+        <strong>📦 Un livrable</strong> = tout document ou produit concret remis à la fin d'une tâche ou d'une phase.
+      </div>
+
+      <p>À partir du WBS détaillé, on peut dresser la liste des livrables avec leur effort estimé et leurs dates :</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Livrable</th><th>Effort (j)</th><th>Début</th><th>Fin</th></tr></thead>
+          <tbody>
+            <tr><td>Plan de projet</td><td>5</td><td>2014-01-19</td><td>2014-01-25</td></tr>
+            <tr><td>Document de Vision</td><td>15</td><td>2014-01-17</td><td>2014-01-26</td></tr>
+            <tr><td>Document de SRS (Spécification des exigences)</td><td>75</td><td>2014-01-19</td><td>2014-02-06</td></tr>
+            <tr><td>Cartographie de processus d'affaire</td><td>30</td><td>2014-02-01</td><td>2014-02-24</td></tr>
+            <tr><td>Manuel de l'utilisateur</td><td>5</td><td>2014-03-02</td><td>2014-03-02</td></tr>
+            <tr><td>Rapport de Post-Mortem</td><td>6</td><td>2014-04-05</td><td>2014-04-10</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GANTT -->
+      <h3 id="gantt">2.4.7 — L'Échéancier : réseau de tâches et diagramme de Gantt</h3>
+
+      <div class="def">
+        <strong>📅 L'échéancier</strong> = représentation temporelle de toutes les tâches du projet, avec leurs dépendances.
+      </div>
+
+      <p>Pour construire l'échéancier, on part du WBS et on identifie pour chaque tâche :</p>
+      <ul style="padding-left:20px;line-height:2;margin-bottom:16px;">
+        <li><strong>Prédécesseurs</strong> : quelles tâches doivent être terminées avant que celle-ci commence ?</li>
+        <li><strong>Durée</strong> : combien de jours faut-il ?</li>
+        <li><strong>Nombre d'employés</strong> : combien de personnes travaillent dessus ?</li>
+      </ul>
+
+      <div class="card accent-l">
+        <div class="card-label">Exemple de tableau de dépendances</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Description</th><th>Prédécesseurs</th><th>Durée</th><th>Nb employés</th></tr></thead>
+            <tbody>
+              <tr><td>2.1</td><td>Recevoir l'approbation</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>3.1</td><td>Analyser les exigences</td><td>2.1</td><td>1j</td><td>2</td></tr>
+              <tr><td>3.2.1</td><td>Revoir les composants</td><td>3.1</td><td>6j</td><td>4</td></tr>
+              <tr><td>3.2.2</td><td>Concevoir composants</td><td>3.1</td><td>3j</td><td>1</td></tr>
+              <tr><td>3.2.3</td><td>Concevoir interfaces</td><td>3.2.2</td><td>1j</td><td>2</td></tr>
+              <tr><td>3.3.1</td><td>Coder les composants</td><td>3.2.2</td><td>6j</td><td>2</td></tr>
+              <tr><td>3.5.1</td><td>Effectuer les tests</td><td>3.4.2, 3.4.3, 3.5.1</td><td>1j</td><td>2</td></tr>
+              <tr><td>3.6</td><td>Tests d'acceptation</td><td>3.5.2</td><td>1j</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card accent-g">
+        <div class="card-label">Le Diagramme de Gantt</div>
+        <p>La même information peut être visualisée sous forme de <strong>diagramme de Gantt</strong> : chaque tâche est une barre horizontale sur une timeline. Les flèches montrent les dépendances. C'est l'outil de communication le plus courant pour montrer l'échéancier d'un projet.</p>
+        <p style="margin-top:8px;color:var(--muted);font-size:13px;">Outils modernes : Microsoft Project, Jira, Asana, Monday.com, ou même Excel.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="mesurer">
+      <h2 class="section-title"><span class="num">2.5</span> Mesurer et Contrôler le Projet</h2>
+
+      <p>Un plan sans suivi ne sert à rien. La section 7 du plan de projet documente les <strong>mécanismes de contrôle</strong>.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div>
+            <strong>Décider de la fréquence des rapports d'avancement</strong><br>
+            <span style="color:var(--muted);font-size:14px;">Hebdomadaire ? Bi-hebdomadaire ? Mensuel ? Dépend de la taille et du risque du projet. Un rapport d'avancement typique contient : % d'avancement, tâches complétées, tâches en cours, obstacles, prochaines étapes.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div>
+            <strong>Gérer les écarts (si on est en retard ou dépassé)</strong><br>
+            <span style="color:var(--muted);font-size:14px;">Il y a 6 leviers possibles :</span>
+            <ul style="padding-left:16px;margin-top:6px;color:var(--muted);font-size:14px;line-height:2;">
+              <li>📅 Prolonger la durée du projet (repousser la date de livraison)</li>
+              <li>👥 Ajouter plus de personnel</li>
+              <li>🎓 Utiliser des compétences plus spécialisées</li>
+              <li>🔧 Améliorer le processus de développement</li>
+              <li>💻 Améliorer la technologie utilisée</li>
+              <li>✂️ Réduire les fonctionnalités à livrer (le plus courant en Agile)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div>
+            <strong>Mesurer et contrôler les livrables</strong><br>
+            <span style="color:var(--muted);font-size:14px;">S'assurer que chaque livrable respecte les critères d'acceptation définis au départ.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card accent-w">
+        <div class="card-label">⚠️ Piège classique</div>
+        <p>La loi de Murphy en GP : <em>"Si quelque chose peut mal tourner, ça tournera mal."</em> Ne pas attendre la fin du projet pour vérifier l'avancement. Plus on détecte un problème tôt, moins il coûte cher à corriger.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="fermeture">
+      <h2 class="section-title"><span class="num">2.6</span> Fermeture du Projet</h2>
+
+      <p>Souvent négligée, la phase de fermeture est pourtant cruciale pour l'amélioration continue. Le cours l'appelle aussi la <span class="hl2">rétrospective</span>.</p>
+
+      <div class="card accent-g">
+        <div class="card-label">Les Leçons Apprises (Post-Mortem)</div>
+        <p>On documente <strong>4 aspects</strong> :</p>
+        <div class="grid2" style="margin-top:12px;">
+          <div class="def">
+            <strong>Processus</strong> — Quelles pratiques de gestion ont bien fonctionné ? Lesquelles ont causé des problèmes ?
+          </div>
+          <div class="def">
+            <strong>Aspects techniques</strong> — Quels choix technologiques ont été bénéfiques ? Lesquels ont créé des difficultés ?
+          </div>
+          <div class="def">
+            <strong>Caractéristiques de l'application</strong> — Qu'est-ce qui dans le logiciel lui-même a aidé ou nui ?
+          </div>
+          <div class="def">
+            <strong>Résultats finaux</strong> — A-t-on respecté le budget, les délais, la qualité ? Quels dépassements y a-t-il eu ?
+          </div>
+        </div>
+      </div>
+
+      <div class="card accent-l">
+        <div class="card-label">💡 Pourquoi c'est important</div>
+        <p>Les leçons apprises permettent d'améliorer les <strong>prochains projets</strong>. Elles alimentent la <em>rétention des données</em> organisationnelles et servent de référence pour les futures estimations (données historiques pour les Points de Fonction, par exemple).</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="synthese">
+      <h2 class="section-title"><span class="num">📚</span> Synthèse du Chapitre</h2>
+
+      <h3>Les phases du processus de gestion de projet</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Phase</th><th>Acteur principal</th><th>Ce qu'on fait</th><th>Sortie (livrable)</th></tr></thead>
+          <tbody>
+            <tr><td><strong class="hl2">Élaboration</strong></td><td>Promoteur</td><td>Définir l'idée, analyser la faisabilité, décider de réaliser</td><td>Mandat</td></tr>
+            <tr><td><strong class="hl">Planification</strong></td><td>Mandataire</td><td>Préparer le plan d'exécution complet</td><td>Plan approuvé</td></tr>
+            <tr><td><strong class="hl3">Exécution</strong></td><td>Mandataire</td><td>Produire et livrer l'extrant (le logiciel)</td><td>Extrant livré</td></tr>
+            <tr><td><strong class="hlw">Clôture</strong></td><td>Mandataire</td><td>Préparer les rapports d'évaluation, leçons apprises</td><td>Rapport post-mortem</td></tr>
+            <tr><td><strong class="hld">Avantages</strong></td><td>Mandataire + Promoteur</td><td>Récolter les bénéfices du projet</td><td>Valeur créée</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card accent-g">
+        <div class="card-label">Point clé examen</div>
+        <p>L'événement clé qui <strong>démarre la phase d'exécution</strong> est : <span class="hl3">l'approbation du plan de projet</span>. Sans approbation formelle, on ne peut pas commencer à coder.</p>
+      </div>
+
+      <h3>Comparaison des techniques d'estimation</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Technique</th><th>Approche</th><th>Précision</th><th>Effort requis</th><th>Idéal pour</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Delphi</strong></td><td>Consensus d'experts</td><td>Moyenne</td><td>Moyen (temps de réunion)</td><td>Projets nouveaux, incertains</td></tr>
+            <tr><td><strong>Descendante</strong></td><td>Du global vers le détail</td><td>Faible à moyenne</td><td>Faible</td><td>Estimations préliminaires rapides</td></tr>
+            <tr><td><strong>Ascendante</strong></td><td>Du détail vers le global</td><td>Élevée</td><td>Élevé</td><td>Planification détaillée</td></tr>
+            <tr><td><strong>Points de Fonction</strong></td><td>Mesure fonctionnelle</td><td>Élevée</td><td>Moyen</td><td>Logiciels avec cas d'utilisation clairs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Acronymes et termes-clés à retenir</h3>
+      <div class="grid2">
+        <div class="def"><strong>WBS</strong> — Work Breakdown Structure : découpage hiérarchique du projet en tâches.</div>
+        <div class="def"><strong>RACI</strong> — Responsible, Accountable, Consulted, Informed : matrice de responsabilités.</div>
+        <div class="def"><strong>CDP</strong> — Comité de Direction de Projet : instance d'approbation supérieure.</div>
+        <div class="def"><strong>AQL</strong> — Assurance Qualité Logiciel : revues et audits de qualité.</div>
+        <div class="def"><strong>PF</strong> — Points de Fonction : unité de mesure de la taille fonctionnelle d'un logiciel.</div>
+        <div class="def"><strong>CMMI</strong> — Capability Maturity Model Integration : référentiel de maturité des processus.</div>
+        <div class="def"><strong>ISBSG</strong> — International Software Benchmarking Standards Group : base de données de productivité logicielle.</div>
+        <div class="def"><strong>MEP</strong> — Mise En Production : déploiement du logiciel en production.</div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="quiz">
+      <h2 class="section-title"><span class="num">🎯</span> Questions susceptibles d'être à l'examen</h2>
+      <p style="margin-bottom:24px;">Cliquez sur chaque question pour révéler la réponse.</p>
+
+      <div class="quiz-section">
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q1</span> Quels sont les 6 problèmes les plus fréquents en gestion de projet logiciel ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <strong>Les 6 problèmes fréquents sont :</strong>
+            <ol style="padding-left:20px;line-height:2;margin-top:8px;">
+              <li><strong>Planification</strong> — on ne prévoit pas suffisamment le travail à faire.</li>
+              <li><strong>Estimation</strong> — on sous-estime systématiquement le temps nécessaire.</li>
+              <li><strong>Coordination et Contrôle</strong> — les activités parallèles ne sont pas bien synchronisées.</li>
+              <li><strong>Mesure</strong> — sans métriques, on ne sait pas si le projet avance bien.</li>
+              <li><strong>Communication</strong> — les malentendus entre client, équipe et direction.</li>
+              <li><strong>Gestion des risques</strong> — on ne prévoit pas les événements imprévus.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q2</span> Expliquez les 5 dimensions d'un projet et ce que signifie le pentagone. Donnez un exemple de compromis.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>Les 5 dimensions sont : <strong>Fonctionnalités, Qualité, Coût, Échéance, Personnel</strong>. Elles forment un pentagone car toucher à l'une affecte les autres — on ne peut pas tout maximiser simultanément.</p>
+            <p style="margin-top:10px;"><strong>Exemple de compromis :</strong> Le client demande 20 nouvelles fonctionnalités en gardant la même échéance (3 mois) et le même budget. C'est impossible. Le gestionnaire doit négocier : soit on repousse l'échéance à 5 mois, soit on réduit les fonctionnalités à 12, soit on augmente le budget pour ajouter du personnel.</p>
+            <p style="margin-top:10px;"><strong>Note Agile :</strong> En Agile, la qualité est non négociable et l'équipe est fixe. On ajuste donc les fonctionnalités livrées à chaque sprint.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q3</span> Qu'est-ce qu'un WBS ? Listez ses 5 avantages.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>Un <strong>WBS (Work Breakdown Structure)</strong> est une décomposition hiérarchique du projet en tâches de plus en plus granulaires, jusqu'à des unités gérables et estimables. On parle aussi de jalonnement.</p>
+            <p style="margin-top:10px;"><strong>5 avantages :</strong></p>
+            <ol style="padding-left:20px;line-height:2;margin-top:6px;">
+              <li><strong>Meilleure planification</strong> — vision globale du travail, facilite l'estimation des durées.</li>
+              <li><strong>Maîtrise du suivi</strong> — les jalons permettent de mesurer l'avancement précisément.</li>
+              <li><strong>Meilleure communication</strong> — tout le monde partage la même compréhension du projet.</li>
+              <li><strong>Meilleure gestion des coûts</strong> — l'allocation des ressources est plus précise, le budget prévisionnel est plus fiable.</li>
+              <li><strong>Meilleure gestion des risques</strong> — on identifie les zones critiques et on peut préparer des plans préventifs.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q4</span> Qu'est-ce que la matrice RACI ? Expliquez chaque lettre avec un exemple.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>La matrice <strong>RACI</strong> est un outil de gestion de projet qui assigne un rôle précis à chaque personne pour chaque activité du WBS. Elle clarifie le domaine d'intervention de chaque acteur.</p>
+            <ul style="list-style:none;padding:0;margin-top:10px;line-height:2.2;">
+              <li><span class="raci-badge raci-R" style="vertical-align:middle;">R</span> <strong style="margin-left:8px;">Responsible (Réalisateur)</strong> — celui qui fait le travail. Ex: le développeur qui code la fonctionnalité "Créer un compte". Peut être plusieurs personnes.</li>
+              <li><span class="raci-badge raci-A" style="vertical-align:middle;">A</span> <strong style="margin-left:8px;">Accountable (Approbateur)</strong> — celui qui est responsable au final et qui signe. <em>Un seul par activité.</em> Ex: le chef de projet qui approuve le plan de test.</li>
+              <li><span class="raci-badge raci-C" style="vertical-align:middle;">C</span> <strong style="margin-left:8px;">Consulted (Consulté)</strong> — celui qu'on consulte avant de décider. Ex: l'expert sécurité consulté pour valider l'architecture.</li>
+              <li><span class="raci-badge raci-I" style="vertical-align:middle;">I</span> <strong style="margin-left:8px;">Informed (Informé)</strong> — celui qu'on tient au courant des décisions, sans le consulter. Ex: le directeur informé des résultats de tests.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q5</span> Décrivez les 6 étapes de la technique de taille fonctionnelle (Points de Fonction). Pourquoi est-elle utile ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>6 étapes :</strong></p>
+            <ol style="padding-left:20px;line-height:2;margin-top:8px;">
+              <li>Établir les frontières du logiciel à estimer (qu'est-ce qui est dans/hors du système ?)</li>
+              <li>Identifier les Entrées (E) et Sorties (X)</li>
+              <li>Identifier les Mouvements de données : Lectures (R) et Écritures (W)</li>
+              <li>Additionner le total des Points de Fonction</li>
+              <li>Identifier la valeur en jours-personnes/PF depuis les données historiques (ou ISBSG)</li>
+              <li>Comparer avec un collègue et faire la moyenne</li>
+            </ol>
+            <p style="margin-top:12px;"><strong>Utilité :</strong> Les PF mesurent ce que le logiciel <em>fait</em> (fonctionnalités livrées) plutôt que comment il est fait (lignes de code). Cela rend la mesure <strong>indépendante du langage de programmation</strong> et permet de comparer des projets entre eux. Exemple : 74 PF × 8h/PF = 592 heures estimées.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q6</span> Quelle est la différence entre le Comité de Direction de Projet (CDP) et le Comité de Projet ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>Comité de Direction de Projet (CDP) :</strong> Niveau stratégique. Composé du VP responsable et du Conseil TI. Il approuve les objectifs d'affaires, identifie les priorités, prend les décisions sur les risques majeurs (budget, délais, RH), approuve les changements de portée et donne son accord pour la clôture.</p>
+            <p style="margin-top:10px;"><strong>Comité de Projet :</strong> Niveau opérationnel. Composé du chef de projet, du co-pilote, du pilote, du responsable TI et des analystes. Il coordonne le travail au quotidien, supervise toutes les phases, et escalade les problèmes importants au CDP.</p>
+            <p style="margin-top:10px;"><strong>Analogie :</strong> Le CDP est le conseil d'administration ; le Comité de Projet est l'équipe de direction exécutive.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q7</span> Quels sont les 3 référentiels importants en génie logiciel et quel est le rôle de chacun ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <ol style="padding-left:20px;line-height:2.2;margin-top:8px;">
+              <li><strong>CMMI</strong> (Capability Maturity Model Integration) — présente les processus de gestion de projets logiciels organisés en niveaux de maturité (1 à 5). Indique <em>ce qu'une organisation devrait faire</em> pour bien gérer ses projets.</li>
+              <li><strong>ISO/IEEE 12207</strong> — liste toutes les activités obligatoires et optionnelles pour un projet de génie logiciel. C'est un référentiel complet qui sert de menu.</li>
+              <li><strong>ISO/IEEE 16326</strong> — présente le plan de projet normalisé de l'ingénieur logiciel. C'est un modèle de document standard à suivre.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q8</span> Si un projet est en retard, quelles sont les 6 options possibles pour gérer cet écart ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>Selon le cours, face à un écart (retard ou dépassement), le gestionnaire peut :</p>
+            <ol style="padding-left:20px;line-height:2.2;margin-top:8px;">
+              <li><strong>Prolonger la durée du projet</strong> — repousser la date de livraison.</li>
+              <li><strong>Ajouter plus de personnel</strong> — attention à la loi de Brooks : "ajouter des gens à un projet en retard le retarde davantage."</li>
+              <li><strong>Utiliser des compétences plus spécialisées</strong> — remplacer des généralistes par des experts.</li>
+              <li><strong>Améliorer le processus de développement</strong> — éliminer les inefficacités.</li>
+              <li><strong>Améliorer la technologie</strong> — meilleurs outils, automatisation.</li>
+              <li><strong>Réduire les fonctionnalités à livrer</strong> — livrer un MVP (produit minimum viable), puis ajouter des fonctionnalités plus tard.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q9</span> Quel est l'événement clé qui déclenche la phase d'exécution d'un projet ? Pourquoi est-ce important ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>L'événement clé est : <strong>l'approbation formelle du plan de projet</strong>.</p>
+            <p style="margin-top:10px;">Avant d'approuver le plan, on est en phase de planification. Ce n'est qu'après l'approbation (par le CDP ou le commanditaire) qu'on peut commencer à dépenser les ressources et à développer.</p>
+            <p style="margin-top:10px;"><strong>Pourquoi c'est important :</strong> L'approbation valide que (1) le budget est alloué, (2) l'équipe est mobilisée, (3) les objectifs sont clairs et acceptés par toutes les parties. Sans cela, l'équipe travaillerait sans mandat officiel.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q10</span> Expliquez la technique Delphi d'estimation en décrivant ses étapes et ses avantages/inconvénients.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>La méthode Delphi</strong> est une technique d'estimation par consensus d'experts via des rondes anonymes.</p>
+            <p style="margin-top:8px;"><strong>Étapes :</strong></p>
+            <ol style="padding-left:20px;line-height:1.9;margin-top:4px;">
+              <li>Le modérateur présente le projet / la problématique à 3+ experts</li>
+              <li>Chaque expert estime individuellement (sans se concerter)</li>
+              <li>Le modérateur collecte les estimations anonymement et calcule la moyenne</li>
+              <li>La moyenne est révélée, discussion des écarts (1er tour)</li>
+              <li>Nouvelle ronde d'estimations individuelles</li>
+              <li>On répète jusqu'à convergence des estimations</li>
+            </ol>
+            <p style="margin-top:10px;"><strong>Avantages :</strong> Réduit les biais de conformisme et d'autorité. Produit un consensus légitime. Les divergences d'opinion font émerger des risques cachés.</p>
+            <p style="margin-top:6px;"><strong>Inconvénients :</strong> Prend du temps. Nécessite des experts disponibles. La convergence n'est pas toujours atteinte.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q11 — Bonus difficile</span> Donnez un exemple de calcul d'estimation avec les Points de Fonction. Comment passe-t-on des PF aux heures ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>Imaginons une application avec 5 processus fonctionnels simples :</p>
+            <ul style="padding-left:20px;line-height:2;margin-top:8px;">
+              <li>Créer un compte : 1E + 1R + 1W + 1X = <strong>4 PF</strong></li>
+              <li>Modifier un compte : 1E + 1R + 1W + 1X = <strong>4 PF</strong></li>
+              <li>Lire les comptes : 1E + 1R + 0W + 2X = <strong>4 PF</strong></li>
+              <li>Créer une annonce : 1E + 1R + 1W + 1X = <strong>4 PF</strong></li>
+              <li>Rechercher annonces (complexe) : 3E + 3R + 0W + 4X = <strong>10 PF</strong></li>
+            </ul>
+            <p style="margin-top:10px;"><strong>Total : 26 PF</strong></p>
+            <p style="margin-top:8px;">Si la productivité historique est de 8 heures par point de fonction :</p>
+            <div class="formula" style="margin-top:8px;">26 PF × 8 h/PF = <strong>208 heures</strong> estimées</div>
+            <p>Ces 208h correspondent à environ <strong>26 jours-personnes</strong> (à 8h/jour), soit ~5.2 semaines pour 1 développeur, ou ~2.6 semaines pour une équipe de 2.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+function toggleQuiz(el) {
+  el.classList.toggle('open');
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

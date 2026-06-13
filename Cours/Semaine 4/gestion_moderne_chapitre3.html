@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion moderne des projets logiciels — Chapitre 3 (Guide détaillé)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1625;
+    --ink-soft:#4b4560;
+    --paper:#f3f1f5;
+    --paper-2:#e9e5ee;
+    --card:#fbfafc;
+    --line:#cec7d6;
+    --accent:#6d28d9;
+    --accent-2:#3730a3;
+    --warm:#c2410c;
+    --success:#047857;
+    --highlight:#ede9fe;
+    --shadow:rgba(30,15,50,.15);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:radial-gradient(circle at 8% -4%,#f7f5fa 0%,transparent 42%),radial-gradient(circle at 94% 3%,#ede8f3 0%,transparent 38%),var(--paper);color:var(--ink);font-family:'Spectral',Georgia,serif;font-size:18px;line-height:1.72;-webkit-font-smoothing:antialiased;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 24px 120px;}
+
+  header.hero{text-align:center;padding:80px 0 50px;border-bottom:3px double var(--line);margin-bottom:20px;}
+  .kicker{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.28em;font-size:.72rem;color:var(--accent);margin-bottom:22px;}
+  header.hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.3rem,6.2vw,4rem);line-height:1.02;margin:0 0 10px;color:var(--ink);}
+  header.hero h1 .em{color:var(--accent);font-style:normal;}
+  .sub{font-style:italic;color:var(--ink-soft);font-size:1.05rem;max-width:600px;margin:18px auto 0;}
+  .meta{margin-top:26px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ink-soft);letter-spacing:.05em;}
+
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:26px 30px;margin:38px 0 60px;box-shadow:0 14px 40px -28px var(--shadow);}
+  nav.toc h2{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 16px;font-weight:600;}
+  nav.toc ol{margin:0;padding:0;list-style:none;counter-reset:toc;}
+  nav.toc li{counter-increment:toc;margin:0 0 9px;}
+  nav.toc a{color:var(--ink-soft);text-decoration:none;font-size:.96rem;display:flex;gap:10px;align-items:baseline;transition:.2s;}
+  nav.toc a::before{content:counter(toc,decimal-leading-zero);font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);flex-shrink:0;}
+  nav.toc a:hover{color:var(--accent);}
+
+  section{margin:0 0 72px;scroll-margin-top:20px;}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:8px;border-bottom:2px solid var(--ink);padding-bottom:10px;}
+  .sec-num{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent);font-weight:600;flex-shrink:0;padding-top:6px;}
+  h2.sec-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1.08;margin:0;}
+  h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.3rem;margin:42px 0 4px;color:var(--accent-2);}
+  h4{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:28px 0 6px;font-weight:600;}
+  p{margin:14px 0;}
+  strong{color:var(--ink);font-weight:600;}
+  .term{background:linear-gradient(transparent 58%,var(--highlight) 58%);font-weight:600;padding:0 1px;}
+  em.fr{font-style:italic;color:var(--accent-2);}
+  ul,ol{margin:14px 0;padding-left:26px;}
+  li{margin:7px 0;}
+  ul.clean{list-style:none;padding-left:0;}
+  ul.clean li{padding-left:26px;position:relative;}
+  ul.clean li::before{content:"▸";position:absolute;left:2px;color:var(--accent);font-size:.9em;}
+
+  .box{border-radius:6px;padding:20px 24px;margin:24px 0;position:relative;}
+  .box .label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:8px;}
+  .def{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent-2);}
+  .def .label{color:var(--accent-2);}
+  .analogy{background:#f0ecf5;border:1px dashed var(--warm);}
+  .analogy .label{color:var(--warm);}
+  .analogy::after{content:"🔑";position:absolute;top:14px;right:18px;font-size:1.1rem;opacity:.5;}
+  .retain{background:#eee8f7;border:1px solid #c4b5d8;border-left:4px solid var(--accent);}
+  .retain .label{color:var(--accent);}
+  .vs{background:#f5f2f8;border:1px solid var(--line);border-left:4px solid var(--warm);}
+  .vs .label{color:var(--warm);}
+
+  /* kanban board visual */
+  .kb{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:24px 0;}
+  .kb .col{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:10px 12px;text-align:center;font-size:.82rem;}
+  .kb .col b{display:block;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+  .kb .col .wip{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--warm);font-weight:600;}
+  .kb .col .card-item{background:var(--highlight);border:1px solid #c4b5d8;border-radius:3px;padding:4px 6px;margin:4px 0;font-size:.78rem;font-weight:500;}
+
+  /* capacity grid */
+  .capgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
+  .capgrid .cat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px 20px;border-top:3px solid var(--accent);}
+  .capgrid .cat b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;color:var(--accent-2);margin-bottom:8px;}
+  .capgrid .cat ul{margin:0;padding-left:18px;font-size:.9rem;}
+  .capgrid .cat ul li{margin:4px 0;}
+  .capgrid .cat .num{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);font-weight:600;}
+
+  /* metrics */
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:24px 0;}
+  .metrics .m{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:16px 14px;text-align:center;}
+  .metrics .m .icon{font-size:1.6rem;margin-bottom:6px;}
+  .metrics .m .name{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:600;display:block;}
+  .metrics .m small{color:var(--ink-soft);font-size:.82rem;display:block;margin-top:4px;}
+
+  table.cmp{width:100%;border-collapse:collapse;margin:24px 0;font-size:.92rem;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .cmp th,.cmp td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);}
+  .cmp thead th{background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;}
+  .cmp tbody th{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;color:var(--accent);width:24%;}
+  .cmp tr:last-child td,.cmp tr:last-child th{border-bottom:none;}
+
+  .pill{display:inline-block;background:var(--paper-2);border:1px solid var(--line);border-radius:20px;padding:2px 12px;font-size:.82rem;font-family:'JetBrains Mono',monospace;margin:3px 4px 3px 0;}
+
+  .exam details{background:var(--card);border:1px solid var(--line);border-radius:6px;margin:14px 0;overflow:hidden;}
+  .exam summary{cursor:pointer;padding:16px 22px;font-weight:600;list-style:none;display:flex;gap:12px;align-items:flex-start;transition:.2s;}
+  .exam summary::-webkit-details-marker{display:none;}
+  .exam summary::before{content:"Q";font-family:'JetBrains Mono',monospace;background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;flex-shrink:0;margin-top:2px;}
+  .exam summary:hover{background:#f5f2f8;}
+  .exam details[open] summary{border-bottom:1px solid var(--line);background:#f5f2f8;}
+  .exam .answer{padding:6px 22px 20px 58px;color:var(--ink-soft);}
+  .exam .answer strong{color:var(--accent-2);}
+
+  footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--ink-soft);letter-spacing:.1em;padding-top:30px;border-top:3px double var(--line);}
+  footer .accent{color:var(--accent);}
+
+  @media(max-width:620px){
+    body{font-size:16.5px;}
+    .sec-head{flex-direction:column;gap:4px;}
+    .capgrid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">UQAM · INF6150 · Chapitre 3 (suite)</div>
+    <h1>Kanban, SAFe &amp; <span class="em">DevOps</span></h1>
+    <p class="sub">Guide d'étude complet — la gestion plus moderne des projets logiciels, chaque concept décortiqué, avec analogies et questions d'examen.</p>
+    <div class="meta">Sections 3.4 – 3.6 · d'après les notes de A. April &amp; S. Trudel</div>
+  </header>
+
+  <nav class="toc">
+    <h2>Plan du chapitre</h2>
+    <ol>
+      <li><a href="#kanban">3.4 — Kanban</a></li>
+      <li><a href="#kanban-wip">Kanban — les limites WIP et le pourquoi</a></li>
+      <li><a href="#kanban-decoupe">Kanban — découpage et stand-ups</a></li>
+      <li><a href="#safe">3.5 — Agile à grande échelle &amp; SAFe</a></li>
+      <li><a href="#devops">3.6 — L'approche DevOps</a></li>
+      <li><a href="#devops-vs">Agile vs DevOps — le tableau comparatif</a></li>
+      <li><a href="#devops-piliers">Les piliers de DevOps (Accelerate)</a></li>
+      <li><a href="#devops-cap">Les 24 capacités en 4 catégories</a></li>
+      <li><a href="#devops-mesures">Les 5 mesures clés de performance</a></li>
+      <li><a href="#synthese">Synthèse — SCRUM vs Kanban vs SAFe vs DevOps</a></li>
+      <li><a href="#exam">Questions d'examen</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 1. KANBAN ============ -->
+  <section id="kanban">
+    <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">3.4 — Le modèle Kanban</h2></div>
+
+    <p><strong>Kanban</strong> est un mot japonais qui signifie littéralement «&nbsp;panneau visuel&nbsp;» ou «&nbsp;signal&nbsp;». C'est une méthode <strong>itérative</strong> issue du <em>Lean Manufacturing</em> de Toyota, adaptée au logiciel. Voici ses caractéristiques clés, expliquées une par une.</p>
+
+    <div class="def">
+      <span class="label">Les principes fondamentaux de Kanban</span>
+      <strong>1.</strong> Le <strong>découpage des tâches de manière égale</strong> (chaque tâche = environ 2 à 3 jours).<br>
+      <strong>2.</strong> Une <strong>limite de tâches par colonne</strong> — les travaux en cours (<span class="term">WIP</span> = <em class="fr">Work In Progress</em>).<br>
+      <strong>3.</strong> Des sous-colonnes «&nbsp;en cours&nbsp;» et «&nbsp;terminé&nbsp;» pour visualiser la progression.<br>
+      <strong>4.</strong> Des <strong>règles claires</strong> (la «&nbsp;definition of done&nbsp;») pour dire qu'une tâche est <em>vraiment</em> terminée.<br>
+      <strong>5.</strong> <strong>Pas d'échéance d'itérations</strong>, pas de réunions de planification de début/fin d'étape (contrairement à Scrum).
+    </div>
+
+    <h4>Le tableau Kanban — comment le lire</h4>
+    <p>Le cours montre un tableau avec ces colonnes (de gauche à droite, chaque colonne = une étape du flux)&nbsp;:</p>
+    <div class="kb">
+      <div class="col"><b>Pool of Ideas</b>Idées brutes<div class="card-item">Epic 431</div><div class="card-item">Epic 478</div></div>
+      <div class="col"><b>Feature Prep</b><div class="wip">WIP: 3-10</div><div class="card-item">Epic 444</div></div>
+      <div class="col"><b>Selected</b><div class="wip">WIP: 2-5</div><div class="card-item">Epic 602</div></div>
+      <div class="col"><b>Story Identified</b><div class="wip">WIP: 30</div></div>
+      <div class="col"><b>Story Prep</b><div class="wip">WIP: 15</div></div>
+      <div class="col"><b>Development</b><div class="wip">WIP: 15</div></div>
+      <div class="col"><b>Acceptance</b><div class="wip">WIP: 8</div></div>
+      <div class="col"><b>Deploy</b><div class="wip">WIP: 5</div></div>
+      <div class="col"><b>Delivered</b>✓</div>
+    </div>
+    <p>Chaque carte (une «&nbsp;story&nbsp;» ou une «&nbsp;epic&nbsp;») avance de gauche à droite. Les <strong>chiffres au-dessus</strong> des colonnes sont les <strong>limites WIP</strong> — c'est le nombre maximum de cartes autorisées dans cette colonne en même temps.</p>
+
+    <h3>Le temps de cycle</h3>
+    <div class="def">
+      <span class="label">Définition — Temps de cycle (Cycle time)</span>
+      La durée entre le moment où on <strong>commence</strong> à travailler sur une story et le moment où elle est <strong>«&nbsp;terminée&nbsp;»</strong>. L'objectif&nbsp;: <strong>l'optimiser</strong> (le réduire au maximum).
+    </div>
+
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      Kanban, c'est un <strong>tapis roulant de sushis</strong>. Il y a un nombre limité de places sur le tapis (limite WIP). Le chef ne met un nouveau sushi que quand une place se libère. On ne prépare pas 50 sushis d'avance&nbsp;; on garde le flux régulier. Le «&nbsp;temps de cycle&nbsp;» = combien de minutes entre le moment où le chef commence un sushi et celui où il arrive devant le client.
+    </div>
+
+    <div class="retain">
+      <span class="label">Kanban vs Scrum — la grande différence</span>
+      En <strong>Scrum</strong>, le travail est organisé en <strong>sprints</strong> à durée fixe (2-4 semaines) avec planification de début et revue de fin. En <strong>Kanban</strong>, il n'y a <strong>pas d'itérations à durée fixe</strong> — le flux est <strong>continu</strong>. On ne planifie pas par sprint, on surveille le <strong>WIP</strong> et le <strong>temps de cycle</strong>.
+    </div>
+  </section>
+
+  <!-- ============ 2. WIP ============ -->
+  <section id="kanban-wip">
+    <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Kanban — les limites WIP et le pourquoi</h2></div>
+
+    <h3>Comment calculer les limites WIP&nbsp;?</h3>
+    <p>Le cours donne des <strong>règles pratiques</strong> pour fixer les limites&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Identifier le nombre de développeurs + 30&nbsp;%</strong> — c'est la base de capacité.</li>
+      <li>Mettre la limite max de la colonne de développement = <strong>nombre de développeurs × 2</strong> = nombre de stories «&nbsp;prêtes à développer&nbsp;».</li>
+      <li>Mettre les <strong>entrées</strong> (features en amont) et les <strong>sorties</strong> (déploiement en aval) à <strong>dev / 3</strong>.</li>
+    </ul>
+
+    <h3>Pourquoi limiter le WIP&nbsp;? (les 7 avantages)</h3>
+    <p>Le cours utilise l'expression colorée «&nbsp;<em>il faut éviter d'avoir trop de chats à fouetter</em>&nbsp;». En clair, limiter le WIP&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Gère mieux la capacité</strong> — les personnes sont utilisées à 100&nbsp;% sur ce qui compte.</li>
+      <li><strong>Force à classer logiquement</strong> le travail pour livrer <strong>tous les jours</strong> en production.</li>
+      <li>On ne <strong>démarre que ce qu'on peut finir</strong> en 2-3 jours.</li>
+      <li><strong>Prévient l'accumulation</strong> de travail débuté mais pas terminé (le «&nbsp;work in progress&nbsp;» inutile).</li>
+      <li><strong>Élimine le <em>context switching</em></strong> — on arrête de sauter d'une story à l'autre.</li>
+      <li><strong>Élimine les réunions d'estimation</strong> — puisque chaque story sort en 2-3 jours, pas besoin d'estimer finement.</li>
+      <li><strong>Facilite la communication</strong> — tout le monde voit le même tableau.</li>
+    </ul>
+
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      C'est comme faire la <strong>vaisselle au fur et à mesure</strong> vs tout laisser s'accumuler. Si tu laves chaque assiette tout de suite (WIP = 1), tu ne te retrouves jamais devant une montagne ingérable. Si tu laisses 20 assiettes s'empiler, tu perds du temps à chercher l'éponge sous la pile et tu changes de contexte en permanence.
+    </div>
+  </section>
+
+  <!-- ============ 3. DECOUPE ============ -->
+  <section id="kanban-decoupe">
+    <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Kanban — découpage des tâches et stand-ups</h2></div>
+
+    <h3>Comment découper en tâches de 2-3 jours&nbsp;?</h3>
+    <p>Le découpage évite les réunions de planification et l'estimation formelle&nbsp;: tout est brisé en <strong>petits morceaux</strong>. Le cours propose 5 stratégies de découpage&nbsp;:</p>
+    <ul class="clean">
+      <li>Par <strong>élément fonctionnel</strong> (ex.&nbsp;: une recherche par nombreux paramètres).</li>
+      <li>Par <strong>fonctionnalité CRUD</strong> (Create / Read / Update / Delete — chacune est une tâche séparée).</li>
+      <li>Par <strong>les étapes ou les rôles</strong> d'une transaction (enregistrement, connexion…).</li>
+      <li>Par <strong>cas de test</strong>.</li>
+      <li>Par <strong>difficulté d'implantation</strong>.</li>
+    </ul>
+
+    <h3>Les stand-up meetings Kanban (différents de Scrum)</h3>
+    <p>En Scrum, la mêlée quotidienne tourne autour de «&nbsp;qu'as-tu fait hier / que fais-tu aujourd'hui / as-tu des blocages&nbsp;?&nbsp;». En <strong>Kanban</strong>, les questions sont centrées sur le <strong>tableau</strong> et le <strong>flux</strong>&nbsp;:</p>
+    <ul class="clean">
+      <li>Qu'est-ce qui est <strong>le plus près d'être fini et livrable</strong>&nbsp;?</li>
+      <li>Que pouvons-nous faire <strong>aujourd'hui</strong> pour l'enlever du tableau&nbsp;?</li>
+      <li>Quelqu'un travaille-t-il sur quelque chose <strong>qui ne figure pas au tableau</strong>&nbsp;?</li>
+      <li>Est-ce que quelque chose <strong>bloque</strong> notre progrès&nbsp;?</li>
+      <li>Quelqu'un est-il <strong>disponible</strong> pour aider à déplacer la carte X vers «&nbsp;Terminée&nbsp;»&nbsp;?</li>
+    </ul>
+
+    <div class="retain">
+      <span class="label">À retenir — stand-up Scrum vs Kanban</span>
+      <strong>Scrum</strong>&nbsp;: centré sur les <em>personnes</em> (chacun parle). <strong>Kanban</strong>&nbsp;: centré sur le <em>tableau</em> et le flux (on part de la droite — le plus proche de la livraison — et on remonte vers la gauche).
+    </div>
+  </section>
+
+  <!-- ============ 4. SAFe ============ -->
+  <section id="safe">
+    <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">3.5 — Agile à grande échelle &amp; SAFe</h2></div>
+
+    <h3>Le problème&nbsp;: coordonner plusieurs équipes Agiles</h3>
+    <p>Quand un projet est <strong>trop gros</strong> pour une seule équipe Scrum (5-9 personnes), il faut coordonner <strong>plusieurs équipes</strong> travaillant en parallèle. Les principes de base&nbsp;:</p>
+    <ul class="clean">
+      <li>Instaurer la <strong>livraison continue</strong> de toutes les équipes.</li>
+      <li>Créer un <strong>backlog commun</strong> à toutes les équipes.</li>
+      <li>Favoriser une <strong>culture collaborative</strong>.</li>
+    </ul>
+
+    <h4>Les méthodes à grande échelle (à connaître de nom)</h4>
+    <p><span class="pill">SAFe (Scaled Agile Framework)</span><span class="pill">DAD (Disciplined Agile Delivery)</span><span class="pill">LeSS (Large Scale Scrum)</span><span class="pill">Scrum of Scrums (SoS)</span><span class="pill">LeadingAgile</span></p>
+
+    <h3>SAFe en détail</h3>
+    <p><strong>SAFe</strong> (de Dean Leffingwell) est la plus connue de ces méthodes. Voici ses concepts clés&nbsp;:</p>
+
+    <div class="def">
+      <span class="label">Les 4 niveaux de SAFe</span>
+      <strong>Team</strong> (équipe) → <strong>Program</strong> (programme) → <strong>Solution</strong> (solution d'affaires) → <strong>Portfolio</strong>.<br>
+      Chaque niveau est un zoom arrière&nbsp;: l'équipe travaille sur des <em>stories/tasks</em>, le programme gère des <em>features</em>, la solution assemble des <em>sub-epics</em>, le portfolio pilote des <em>epics</em> et des <em>value streams</em>.
+    </div>
+
+    <h4>La hiérarchie des éléments de travail (du plus gros au plus petit)</h4>
+    <ul class="clean">
+      <li><strong>Epics</strong> (Portfolio) — de très grandes initiatives d'affaires.</li>
+      <li><strong>Sub-epics</strong> (Program) — découpées en architectural sub-epics et business sub-epics.</li>
+      <li><strong>Features</strong> (Program) — des fonctionnalités livrables.</li>
+      <li><strong>Stories</strong> (Team) — les user stories, travaillées par une équipe.</li>
+      <li><strong>Tasks</strong> (Team) — les tâches techniques d'une story.</li>
+    </ul>
+
+    <h4>Les concepts structurants de SAFe</h4>
+    <ul class="clean">
+      <li><strong>PI (Program Increment)</strong> — un cycle de livraison de <strong>5 sprints</strong>&nbsp;: 4 sprints de livraison + 1 sprint d'<strong>innovation et planning</strong>.</li>
+      <li><strong>PI Planning</strong> — l'activité clé qui précède chaque PI. Le cours insiste&nbsp;: <em>«&nbsp;si on ne fait pas de PI Planning, on ne fait pas de SAFe&nbsp;!&nbsp;»</em></li>
+      <li><strong>ART (Agile Release Train)</strong> — le «&nbsp;train de livraison&nbsp;» qui regroupe toutes les équipes d'un même programme et avance au même rythme.</li>
+      <li>Réunion <strong>bihebdomadaire</strong> des Scrum Masters et du/des Chef(s) de Produit pour coordonner.</li>
+    </ul>
+
+    <div class="analogy">
+      <span class="label">Analogie — le train (ART)</span>
+      Imagine un <strong>train de marchandises</strong>. Chaque <strong>wagon</strong> = une équipe Scrum. Chaque wagon transporte des <strong>features</strong> (les boîtes). Le train part <strong>à heure fixe</strong> tous les 5 sprints (le PI), que tous les wagons soient pleins ou pas. Les features qui ne sont pas prêtes à temps attrapent le <strong>prochain train</strong>. Le <strong>PI Planning</strong> = le moment où tout le monde se réunit sur le quai pour charger et coordonner le prochain départ.
+    </div>
+
+    <div class="retain">
+      <span class="label">À retenir pour l'examen</span>
+      SAFe = <strong>4 niveaux</strong> (Team, Program, Solution, Portfolio), <strong>PI de 5 sprints</strong> (4+1), <strong>PI Planning obligatoire</strong>, concept du <strong>Release Train</strong>.
+    </div>
+  </section>
+
+  <!-- ============ 5. DEVOPS ============ -->
+  <section id="devops">
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">3.6 — L'approche DevOps</h2></div>
+
+    <h3>Le problème que DevOps résout (le schéma des 3 «&nbsp;gaps&nbsp;»)</h3>
+    <p>Le cours montre trois acteurs&nbsp;: <strong>Client/utilisateur</strong>, <strong>Développeurs</strong>, <strong>Ops/Infra</strong> (l'équipe d'infrastructure et opérations). Historiquement, il y avait un <strong>gap</strong> (un fossé de communication) entre chacun de ces groupes.</p>
+    <ul class="clean">
+      <li><strong>Agile</strong> a résolu le <strong>premier gap</strong> (entre Client et Développeurs) — rétroaction rapide via les sprints.</li>
+      <li>Mais il restait un <strong>deuxième gap</strong> (entre Développeurs et Ops) — le code était «&nbsp;fini&nbsp;» mais le déploiement en production restait lent, risqué, manuel.</li>
+      <li><strong>DevOps</strong> résout ce <strong>deuxième gap</strong> en intégrant Dev et Ops dans une même boucle.</li>
+    </ul>
+
+    <div class="retain">
+      <span class="label">À retenir — la phrase du cours</span>
+      <strong>«&nbsp;Le DevOps, c'est de l'Agile++&nbsp;»</strong> — c'est l'Agile qui va <em>plus loin</em> en incluant le déploiement, les opérations, la surveillance et l'automatisation.
+    </div>
+
+    <h3>La boucle infinie DevOps</h3>
+    <p>Le symbole classique de DevOps est un <strong>∞</strong> (l'infini) avec des étapes&nbsp;:</p>
+    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:.9rem;letter-spacing:.06em;color:var(--accent);">
+      Plan → Code → Build → Test → Release → Deploy → Operate → Monitor → Plan → …
+    </p>
+    <p>Le côté <strong>gauche</strong> (Plan → Code → Build → Test) = le <strong>Dev</strong>. Le côté <strong>droit</strong> (Release → Deploy → Operate → Monitor) = les <strong>Ops</strong>. La boucle est <strong>continue</strong>&nbsp;: on ne s'arrête jamais.</p>
+
+    <h3>Les racines de DevOps</h3>
+    <p>Le cours montre que DevOps repose sur <strong>quatre piliers</strong>&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Toyota Kata</strong> — les routines d'amélioration continue de Toyota.</li>
+      <li><strong>Approche Lean</strong> — éliminer le gaspillage, travailler en petits lots.</li>
+      <li><strong>Infrastructure Agile</strong> — infrastructure as code, tout automatisé.</li>
+      <li><strong>Livraison Continue</strong> (<em class="fr">Continuous Delivery</em>) — déployer en production de façon automatique et fréquente.</li>
+    </ul>
+    <p>Le tout est ancré dans le <strong>Manifeste Agile</strong> et ses valeurs.</p>
+  </section>
+
+  <!-- ============ 6. AGILE VS DEVOPS ============ -->
+  <section id="devops-vs">
+    <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">Agile vs DevOps — le tableau comparatif</h2></div>
+
+    <p>Ce tableau est un <strong>classique d'examen</strong>. Il montre que Agile et DevOps ne sont pas la même chose — ils se complètent.</p>
+
+    <table class="cmp">
+      <thead><tr><th>Aspect</th><th>Agile</th><th>DevOps</th></tr></thead>
+      <tbody>
+        <tr><th>Focus</th><td>Livraison <strong>rapide et progressive</strong> de fonctionnalités à valeur ajoutée.</td><td>Les aspects de <strong>déploiement et d'opération</strong> du logiciel.</td></tr>
+        <tr><th>Gap comblé</th><td>L'écart <strong>Client ↔ Développeurs</strong> pour accélérer le feedback sur les exigences.</td><td>L'écart <strong>Développeurs ↔ Ops/Infra</strong> pour accélérer la mise en production.</td></tr>
+        <tr><th>Centré sur</th><td>Les <strong>exigences fonctionnelles et non fonctionnelles</strong>.</td><td>La <strong>stabilité des opérations</strong> lors de mises en production répétées + préparation du logiciel pour l'utilisateur final.</td></tr>
+        <tr><th>Compétences</th><td>Formation des membres → <strong>n'importe qui</strong> peut aider à résoudre un problème.</td><td>Divise les tâches à des <strong>spécialistes</strong> mais assure une <strong>communication constante</strong> via des outils intégrés et l'<strong>automatisation</strong>.</td></tr>
+        <tr><th>Rythme de livraison</th><td><strong>Sprints</strong> à fréquence régulière (2-4 semaines).</td><td>Consolide les livrables selon la <strong>valeur pour la clientèle, dès que disponible</strong> (livraison continue).</td></tr>
+      </tbody>
+    </table>
+
+    <div class="retain">
+      <span class="label">À retenir en une phrase</span>
+      <strong>Agile</strong> = on développe <em>les bonnes fonctionnalités</em> rapidement (feedback du client). <strong>DevOps</strong> = on les <em>déploie en production</em> rapidement et de manière fiable (automatisation + ops).
+    </div>
+  </section>
+
+  <!-- ============ 7. PILIERS ============ -->
+  <section id="devops-piliers">
+    <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title">Les 5 principes clés de DevOps (Accelerate)</h2></div>
+
+    <p>Le livre de référence du cours est <em>Accelerate</em> (Forsgren, Humble &amp; Kim, 2018). Il identifie <strong>5 principes clés</strong> et <strong>24 capacités</strong> classées en 4 catégories.</p>
+
+    <h4>Les 5 principes</h4>
+    <ul class="clean">
+      <li><strong>Qualité</strong> — la qualité est non négociable (rappel du diagramme de flexibilité du chapitre 1).</li>
+      <li><strong>Petits lots</strong> (<em class="fr">small batches</em>) — travailler en petits morceaux pour réduire le risque et accélérer le feedback.</li>
+      <li><strong>Automatisation</strong> — automatiser les tests, le build, le déploiement, la surveillance.</li>
+      <li><strong>Amélioration continue</strong> — toujours chercher à faire mieux (héritage du Lean/Toyota).</li>
+      <li><strong>Responsabilité</strong> — chaque membre de l'équipe est responsable de la qualité et de la livraison.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 8. 24 CAPACITES ============ -->
+  <section id="devops-cap">
+    <div class="sec-head"><span class="sec-num">08</span><h2 class="sec-title">Les 24 capacités en 4 catégories</h2></div>
+
+    <div class="capgrid">
+      <div class="cat">
+        <b>Techniques <span class="num">(11 capacités)</span></b>
+        <ul>
+          <li>Automatisation des tests</li>
+          <li>Automatisation du déploiement</li>
+          <li>Développement sur le tronc (<em>trunk-based dev</em>)</li>
+          <li>Décalage à gauche de la sécurité (<em>shift-left security</em>)</li>
+          <li>Architecture découplée</li>
+          <li>Équipes autonomes</li>
+          <li>Intégration Continue (CI)</li>
+          <li>Contrôle des versions (Git, etc.)</li>
+          <li>Gestion des données de test</li>
+          <li>Surveillance (<em>monitoring</em>)</li>
+          <li>Notification proactive</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <b>Lean Management <span class="num">(4 capacités)</span></b>
+        <ul>
+          <li>Limite des travaux en cours (WIP)</li>
+          <li>Gestion visuelle</li>
+          <li>Rétroaction de la production</li>
+          <li>Approbation simple des modifications</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <b>Développement de produit Lean <span class="num">(4 capacités)</span></b>
+        <ul>
+          <li>Travailler en petits lots</li>
+          <li>Rendre le flux de travail visible</li>
+          <li>Recueillir et appliquer la rétroaction des clients</li>
+          <li>Expérimentation de l'équipe</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <b>Leadership transformationnel <span class="num">(5 capacités)</span></b>
+        <ul>
+          <li>Vision</li>
+          <li>Communication inspirante</li>
+          <li>Stimulation intellectuelle</li>
+          <li>Meneur supporteur</li>
+          <li>Reconnaissance personnelle</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Les termes à bien comprendre</h4>
+    <ul class="clean">
+      <li><strong>Intégration Continue (CI)</strong> — chaque développeur fusionne son code dans le tronc principal <em>plusieurs fois par jour</em>, et un serveur compile et teste automatiquement à chaque commit.</li>
+      <li><strong>Développement sur le tronc</strong> (<em class="fr">trunk-based development</em>) — au lieu de garder de longues branches séparées pendant des semaines, tout le monde travaille sur la branche principale (le «&nbsp;tronc&nbsp;»). Ça force à intégrer souvent.</li>
+      <li><strong>Décalage à gauche de la sécurité</strong> (<em class="fr">shift-left security</em>) — au lieu de vérifier la sécurité à la fin (à droite du cycle), on la vérifie <em>dès le début</em> (à gauche), dans le code et les tests automatiques.</li>
+      <li><strong>Architecture découplée</strong> — des composants faiblement couplés (ex.&nbsp;: microservices) que chaque équipe peut déployer indépendamment.</li>
+      <li><strong>Gestion visuelle</strong> — rendre le travail visible (tableaux Kanban, dashboards de CI/CD), pour que tout le monde voit l'état du flux en temps réel.</li>
+    </ul>
+
+    <div class="analogy">
+      <span class="label">Analogie — «&nbsp;shift-left&nbsp;»</span>
+      Si ton cycle de vie est une ligne de temps de gauche (début) à droite (production), «&nbsp;décaler à gauche&nbsp;» une activité = la faire <strong>plus tôt</strong>. C'est exactement le principe du coût de correction (vu en AQL)&nbsp;: plus on détecte tôt, moins c'est cher. «&nbsp;Shift-left security&nbsp;» = on <strong>sécurise dès le codage</strong>, pas après le déploiement.
+    </div>
+  </section>
+
+  <!-- ============ 9. MESURES ============ -->
+  <section id="devops-mesures">
+    <div class="sec-head"><span class="sec-num">09</span><h2 class="sec-title">Les 5 mesures clés de performance DevOps</h2></div>
+
+    <p>Le livre <em>Accelerate</em> identifie <strong>5 métriques</strong> pour évaluer la performance de livraison de logiciel d'une organisation&nbsp;:</p>
+
+    <div class="metrics">
+      <div class="m"><div class="icon">⏱</div><span class="name">Délai de réalisation</span><small>Le temps de cycle moyen (de l'idée au déploiement).</small></div>
+      <div class="m"><div class="icon">🚀</div><span class="name">Fréquence de déploiement</span><small>Combien de fois on déploie en production, <em>par développeur</em> (pour pouvoir comparer).</small></div>
+      <div class="m"><div class="icon">🔧</div><span class="name">Délai de remise en service</span><small>Le temps moyen pour restaurer le service après une panne.</small></div>
+      <div class="m"><div class="icon">📉</div><span class="name">% de défaillances</span><small>Sur 100 changements, combien ont nécessité corrections ou ajustements.</small></div>
+      <div class="m"><div class="icon">🟢</div><span class="name">Disponibilité</span><small>Le système reste accessible malgré les mises en production fréquentes.</small></div>
+    </div>
+
+    <div class="retain">
+      <span class="label">Pourquoi c'est important — le message du cours</span>
+      La <strong>performance financière</strong> (ou non commerciale) d'une organisation est <strong>directement liée</strong> à sa performance de livraison de logiciel — <strong>même si le développement logiciel n'est pas sa mission première</strong> (une banque, une compagnie d'assurance, une entreprise de transport…). C'est la grande révélation d'<em>Accelerate</em>&nbsp;: la capacité à livrer du logiciel de qualité, vite, est un avantage concurrentiel pour <em>toute</em> organisation.
+    </div>
+  </section>
+
+  <!-- ============ 10. SYNTHESE ============ -->
+  <section id="synthese">
+    <div class="sec-head"><span class="sec-num">10</span><h2 class="sec-title">Synthèse — Scrum vs Kanban vs SAFe vs DevOps</h2></div>
+
+    <p>Le cours conclut en résumant les quatre méthodologies en une phrase chacune&nbsp;:</p>
+
+    <table class="cmp">
+      <thead><tr><th>Méthodologie</th><th>En une phrase</th></tr></thead>
+      <tbody>
+        <tr><th>SCRUM</th><td><strong>Itérations à durée fixe</strong> (sprints) qui reviennent de façon régulière.</td></tr>
+        <tr><th>Kanban</th><td>Un <strong>tableau visuel</strong> (board) où les items passent d'une colonne à l'autre en fonction de leur avancée, avec des <strong>limites WIP</strong>.</td></tr>
+        <tr><th>SAFe</th><td>Gérer de <strong>grands projets</strong> (plusieurs équipes en parallèle) en mode Agile/Kanban/DevOps, avec des <strong>PI de 5 sprints</strong> et un <strong>Release Train</strong>.</td></tr>
+        <tr><th>DevOps</th><td>Ajout du rôle <strong>Ops dans l'équipe Dev Agile</strong> — c'est de l'<strong>Agile++</strong>&nbsp;: automatisation, livraison continue, surveillance.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="vs">
+      <span class="label">Attention — ces méthodes ne sont pas exclusives</span>
+      On peut combiner&nbsp;: par exemple, une équipe fait du <strong>Scrum</strong> ou du <strong>Kanban</strong> au quotidien, dans un cadre <strong>SAFe</strong> pour coordonner avec d'autres équipes, en appliquant des pratiques <strong>DevOps</strong> pour l'automatisation et le déploiement continu.
+    </div>
+  </section>
+
+  <!-- ============ EXAM ============ -->
+  <section id="exam" class="exam">
+    <div class="sec-head"><span class="sec-num">11</span><h2 class="sec-title">Questions d'examen</h2></div>
+    <p>Clique sur une question pour révéler la réponse.</p>
+
+    <details>
+      <summary>Décrivez le modèle Kanban et ses principes fondamentaux.</summary>
+      <div class="answer">Kanban est un modèle <strong>itératif à flux continu</strong> (pas d'itérations à durée fixe). Principes&nbsp;: découpage des tâches en <strong>2-3 jours</strong>, <strong>limite WIP</strong> par colonne, sous-colonnes «&nbsp;en cours&nbsp;» et «&nbsp;terminé&nbsp;», règles claires de fin de tâche (<em>definition of done</em>), et pas de réunions formelles de début/fin d'itération. On mesure et optimise le <strong>temps de cycle</strong>.</div>
+    </details>
+
+    <details>
+      <summary>Qu'est-ce que le WIP et pourquoi le limiter&nbsp;?</summary>
+      <div class="answer"><strong>WIP = Work In Progress</strong> (travaux en cours). On le limite pour&nbsp;: mieux gérer la capacité, forcer à livrer tous les jours, ne démarrer que ce qu'on peut finir en 2-3 jours, éviter l'accumulation de travail non terminé, éliminer le <em>context switching</em>, éliminer les meetings d'estimation, et faciliter la communication.</div>
+    </details>
+
+    <details>
+      <summary>Quelles sont les différences entre le stand-up Scrum et le stand-up Kanban&nbsp;?</summary>
+      <div class="answer"><strong>Scrum</strong>&nbsp;: centré sur les <strong>personnes</strong> (chacun dit ce qu'il a fait/fera/blocages). <strong>Kanban</strong>&nbsp;: centré sur le <strong>tableau/flux</strong> — on part de ce qui est le plus proche de la livraison et on demande ce qu'on peut faire pour le terminer, si quelque chose bloque, si quelqu'un est libre pour aider.</div>
+    </details>
+
+    <details>
+      <summary>Citez cinq techniques de découpage de tâches en Kanban.</summary>
+      <div class="answer">Par <strong>élément fonctionnel</strong>, par <strong>fonctionnalité CRUD</strong>, par <strong>étape/rôle de transaction</strong>, par <strong>cas de test</strong>, par <strong>difficulté d'implantation</strong>.</div>
+    </details>
+
+    <details>
+      <summary>Qu'est-ce que SAFe&nbsp;? Quels sont ses niveaux et ses concepts structurants&nbsp;?</summary>
+      <div class="answer"><strong>SAFe</strong> (Scaled Agile Framework) coordonne <strong>plusieurs équipes Agiles</strong> sur un grand projet. <strong>4 niveaux</strong>&nbsp;: Team, Program, Solution, Portfolio. Concepts&nbsp;: <strong>PI</strong> de 5 sprints (4 livraison + 1 innovation/planning), <strong>PI Planning</strong> (obligatoire&nbsp;: «&nbsp;sans PI Planning, pas de SAFe&nbsp;»), <strong>ART</strong> (Agile Release Train), réunion bihebdomadaire des Scrum Masters.</div>
+    </details>
+
+    <details>
+      <summary>Quel problème DevOps résout-il que l'Agile seul ne résolvait pas&nbsp;?</summary>
+      <div class="answer">L'Agile a comblé le <strong>gap Client ↔ Développeurs</strong> (feedback rapide). Mais le <strong>gap Développeurs ↔ Ops/Infra</strong> restait&nbsp;: le déploiement en production était lent et risqué. DevOps comble ce deuxième gap en intégrant Dev et Ops dans une boucle continue&nbsp;: automatisation, livraison continue, surveillance.</div>
+    </details>
+
+    <details>
+      <summary>Donnez le tableau comparatif Agile vs DevOps (5 dimensions).</summary>
+      <div class="answer"><strong>Focus</strong>&nbsp;: Agile = fonctionnalités à valeur ajoutée / DevOps = déploiement &amp; opérations. <strong>Gap</strong>&nbsp;: Client↔Dev / Dev↔Ops. <strong>Centré sur</strong>&nbsp;: exigences fonctionnelles / stabilité des opérations. <strong>Compétences</strong>&nbsp;: généralistes polyvalents / spécialistes + outils intégrés. <strong>Rythme</strong>&nbsp;: sprints réguliers / livraison continue dès que disponible.</div>
+    </details>
+
+    <details>
+      <summary>Quels sont les 5 principes clés de DevOps (Accelerate)&nbsp;?</summary>
+      <div class="answer"><strong>Qualité</strong>, <strong>petits lots</strong>, <strong>automatisation</strong>, <strong>amélioration continue</strong>, <strong>responsabilité</strong>.</div>
+    </details>
+
+    <details>
+      <summary>Nommez les 4 catégories de capacités DevOps et donnez un exemple pour chacune.</summary>
+      <div class="answer"><strong>Techniques</strong> (11) — ex. intégration continue, automatisation des tests. <strong>Lean Management</strong> (4) — ex. limite des travaux en cours (WIP). <strong>Développement de produit Lean</strong> (4) — ex. travailler en petits lots. <strong>Leadership transformationnel</strong> (5) — ex. vision, communication inspirante.</div>
+    </details>
+
+    <details>
+      <summary>Qu'est-ce que le «&nbsp;shift-left security&nbsp;» (décalage à gauche de la sécurité)&nbsp;?</summary>
+      <div class="answer">Au lieu de vérifier la sécurité <strong>à la fin</strong> du cycle (à droite), on la vérifie <strong>dès le début</strong> (à gauche)&nbsp;: dans le code, les tests automatiques, dès le développement. Le principe&nbsp;: détecter tôt coûte moins cher (même logique que le coût de correction vu en AQL).</div>
+    </details>
+
+    <details>
+      <summary>Quelles sont les 5 mesures clés de performance de livraison logicielle (Accelerate)&nbsp;?</summary>
+      <div class="answer"><strong>Délai de réalisation</strong> (temps de cycle moyen), <strong>fréquence de déploiement</strong> (par développeur), <strong>délai moyen de remise en service</strong> (après panne), <strong>pourcentage de défaillances</strong> (changements nécessitant corrections), <strong>disponibilité</strong> (le système reste accessible malgré les MEP fréquentes).</div>
+    </details>
+
+    <details>
+      <summary>Pourquoi la performance de livraison de logiciel est-elle importante même pour une banque ou une compagnie de transport&nbsp;?</summary>
+      <div class="answer">Parce que selon <em>Accelerate</em>, la <strong>performance financière</strong> d'une organisation est <strong>directement liée</strong> à sa performance de livraison de logiciel — même si le développement logiciel n'est pas sa mission première. La capacité à livrer du logiciel de qualité, rapidement, est un <strong>avantage concurrentiel</strong> pour toute organisation.</div>
+    </details>
+
+    <details>
+      <summary>Résumez SCRUM, Kanban, SAFe et DevOps en une phrase chacun.</summary>
+      <div class="answer"><strong>SCRUM</strong>&nbsp;: itérations à durée fixe (sprints). <strong>Kanban</strong>&nbsp;: board visuel avec limites WIP, flux continu. <strong>SAFe</strong>&nbsp;: coordination de plusieurs équipes Agiles via PI de 5 sprints et Release Train. <strong>DevOps</strong>&nbsp;: Agile++ avec rôle Ops intégré, automatisation et livraison continue.</div>
+    </details>
+  </section>
+
+  <footer>
+    Guide d'étude — Gestion moderne des projets logiciels, Chapitre 3<br>
+    <span class="accent">Bon succès à ton examen, MF.</span>
+  </footer>
+
+</div>
+</body>
+</html>

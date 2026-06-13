@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Publier un service</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #000;
+      padding: 30px;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .etape {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .champ {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border: 1px solid #000;
+      box-sizing: border-box;
+      background: #fff;
+    }
+
+    textarea {
+      height: 90px;
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .row .champ {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border: 1px solid #000;
+      box-sizing: border-box;
+      background: #fff;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid #ccc;
+    }
+
+    .btn-brouillon {
+      padding: 10px 18px;
+      font-size: 13px;
+      border: 1px solid #000;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .btn-continuer {
+      padding: 10px 18px;
+      font-size: 13px;
+      border: none;
+      background: #000;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Publier un service</h1>
+  <hr>
+
+  <div class="champ">
+    <label>Catégorie :</label>
+    <select>
+      <option value="">-- Choisir une catégorie --</option>
+      <option value="reparation" selected>Réparation</option>
+      <option value="jardinage">Jardinage</option>
+      <option value="informatique">Informatique</option>
+      <option value="menage">Ménage</option>
+      <option value="peinture">Peinture</option>
+      <option value="autre">Autre</option>
+    </select>
+  </div>
+
+  <div class="champ">
+    <label>Titre du service :</label>
+    <input type="text" placeholder="Ex : Réparation de vélo à domicile" />
+  </div>
+
+  <div class="champ">
+    <label>Description :</label>
+    <textarea placeholder="Décrivez votre offre..."></textarea>
+  </div>
+
+  <div class="row">
+    <div class="champ">
+      <label>Budget estimé :</label>
+      <input type="text" placeholder="$ 0.00" />
+    </div>
+    <div class="champ">
+      <label>Lieu :</label>
+      <input type="text" placeholder="Ex : Montréal, QC" />
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="btn-continuer">Continuer →</button>
+  </div>
+
+</body>
+</html>

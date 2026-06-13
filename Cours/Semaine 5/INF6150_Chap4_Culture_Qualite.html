@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INF6150 – Chapitre 4 : Culture Qualité</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Serif:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #5b8dee;
+    --accent2: #e8a04e;
+    --accent3: #62d4a0;
+    --accent4: #e06c6c;
+    --text: #d4d8f0;
+    --text-dim: #8890b8;
+    --text-bright: #eef0ff;
+    --tag-bg: #1e2540;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px; height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 24px 0;
+    z-index: 100;
+  }
+  #sidebar .logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  #sidebar .logo span {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  #sidebar .logo p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+  #sidebar nav a {
+    display: block;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  #sidebar nav a:hover {
+    color: var(--text-bright);
+    border-left-color: var(--accent);
+    background: rgba(91,141,238,0.07);
+  }
+  #sidebar nav .section-label {
+    padding: 16px 20px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  /* ── MAIN ── */
+  #main {
+    margin-left: 260px;
+    padding: 48px 56px;
+    max-width: 940px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .hero .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 3px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: var(--text-bright);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 620px;
+    line-height: 1.7;
+  }
+  .hero .quote-box {
+    margin-top: 28px;
+    padding: 16px 24px;
+    border-left: 3px solid var(--accent2);
+    background: rgba(232,160,78,0.07);
+    border-radius: 0 4px 4px 0;
+    font-style: italic;
+    color: var(--accent2);
+    font-size: 15px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 72px;
+    scroll-margin-top: 32px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(91,141,238,0.12);
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .section h2 {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+
+  .subsection {
+    margin-bottom: 40px;
+  }
+  .subsection h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent2);
+  }
+  .subsection h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent3);
+    margin: 16px 0 8px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  /* ── DEFINITION BOX ── */
+  .def-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+    padding: 18px 22px;
+    margin: 16px 0;
+  }
+  .def-box .def-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .def-box p { margin-bottom: 0; color: var(--text-bright); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout.warn {
+    background: rgba(224,108,108,0.1);
+    border: 1px solid rgba(224,108,108,0.25);
+  }
+  .callout.info {
+    background: rgba(91,141,238,0.08);
+    border: 1px solid rgba(91,141,238,0.2);
+  }
+  .callout.success {
+    background: rgba(98,212,160,0.08);
+    border: 1px solid rgba(98,212,160,0.2);
+  }
+  .callout .icon {
+    font-size: 18px;
+    line-height: 1;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .callout .body { font-size: 14.5px; line-height: 1.65; }
+  .callout.warn .body { color: #f0a0a0; }
+  .callout.info .body { color: #a8c0f0; }
+  .callout.success .body { color: #9de8c4; }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 16px 0;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(91,141,238,0.04); }
+
+  /* ── STAT CARDS ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .stat-card.red .num { color: var(--accent4); }
+  .stat-card.orange .num { color: var(--accent2); }
+  .stat-card.green .num { color: var(--accent3); }
+
+  /* ── COST SCALE BAR ── */
+  .cost-bar-wrap {
+    margin: 20px 0;
+  }
+  .cost-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .cost-bar-label {
+    width: 190px;
+    font-size: 13px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .cost-bar-track {
+    flex: 1;
+    background: var(--surface2);
+    border-radius: 3px;
+    height: 10px;
+    position: relative;
+  }
+  .cost-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 0.4s;
+  }
+  .cost-bar-val {
+    width: 80px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── PRINCIPLES LIST ── */
+  .principles-list {
+    list-style: none;
+    padding: 0;
+  }
+  .principles-list li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+  .principles-list li .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    width: 30px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── EXAM QUESTIONS ── */
+  .exam-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent2);
+    border-radius: 6px;
+    padding: 28px 32px;
+    margin-top: 72px;
+  }
+  .exam-section h2 {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 22px;
+    color: var(--accent2);
+    margin-bottom: 24px;
+  }
+  .exam-q {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .exam-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .exam-q .q-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .exam-q .q-text {
+    font-size: 15px;
+    color: var(--text-bright);
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
+  .exam-q details summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    user-select: none;
+    margin-top: 6px;
+  }
+  .exam-q details .answer {
+    margin-top: 12px;
+    padding: 14px 18px;
+    background: rgba(98,212,160,0.07);
+    border: 1px solid rgba(98,212,160,0.2);
+    border-radius: 4px;
+    font-size: 14px;
+    color: #9de8c4;
+    line-height: 1.7;
+  }
+
+  /* ── PENTAGON VIZ ── */
+  .pentagon-wrap {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .pentagon-svg-area { flex-shrink: 0; }
+  .pentagon-legend { flex: 1; min-width: 220px; }
+  .pentagon-legend h4 { color: var(--accent); font-size: 14px; margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  .dim-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
+  .dim-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── TOC ACTIVE ── */
+  #sidebar nav a.active {
+    color: var(--text-bright);
+    border-left-color: var(--accent);
+    background: rgba(91,141,238,0.1);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 860px) {
+    #sidebar { display: none; }
+    #main { margin-left: 0; padding: 24px 20px; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ SIDEBAR ════════════════ -->
+<aside id="sidebar">
+  <div class="logo">
+    <span>INF6150</span>
+    <p>Chapitre 4 — Culture Qualité</p>
+  </div>
+  <nav>
+    <div class="section-label">Plan du cours</div>
+    <a href="#intro">4.1 Introduction</a>
+    <a href="#echec">Échec des projets logiciels</a>
+    <a href="#therac">Cas Thérac-25</a>
+    <a href="#boeing">Cas Boeing 737 Max</a>
+    <a href="#cout-qualite">4.2 Coût de la qualité</a>
+    <a href="#propagation">Propagation des erreurs</a>
+    <a href="#injection">Injection des défauts</a>
+    <a href="#qualite-def">Définition de la qualité</a>
+    <a href="#vv">Vérification & Validation</a>
+    <a href="#culture">4.3 Culture qualité</a>
+    <a href="#principes">14 Principes (Wiegers)</a>
+    <a href="#dimensions">4.4 Cinq dimensions</a>
+    <a href="#exam">Questions d'examen</a>
+  </nav>
+</aside>
+
+<!-- ════════════════ MAIN ════════════════ -->
+<main id="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="tag">INF6150 · Chapitre 4</div>
+    <h1>La culture qualité, les neurosciences, l'éthique et les considérations environnementales des projets logiciels</h1>
+    <p>Guide d'étude complet et détaillé — chaque concept expliqué en profondeur, chaque question du cours répondue, avec des exemples réels et des questions d'examen pratiques.</p>
+    <div class="quote-box">
+      « Nous n'avons jamais le temps de faire un travail correctement la première fois, mais nous arrivons toujours à trouver du temps pour refaire le travail une ou deux fois. » — Anonyme
+      <br><br>
+      <strong style="font-style:normal; color: #d4a060;">Ce que ça veut dire :</strong> On néglige souvent la qualité pour aller vite, mais on finit par passer encore plus de temps à corriger les erreurs. C'est exactement ce que ce chapitre démontre avec des chiffres concrets.
+    </div>
+  </div>
+
+  <!-- ══════ 4.1 INTRO ══════ -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <span class="section-num">4.1</span>
+      <h2>Introduction</h2>
+    </div>
+
+    <p>Ce chapitre pose un constat simple mais fondamental : <strong style="color:var(--text-bright)">la qualité logicielle n'est pas un luxe, c'est une obligation professionnelle et économique.</strong></p>
+
+    <div class="def-box">
+      <div class="def-label">Responsabilité civile de l'ingénieur</div>
+      <p>Un ingénieur membre de son ordre professionnel (ex. Ordre des ingénieurs du Québec) est <strong>légalement et éthiquement responsable</strong> des produits qu'il livre. Si un logiciel cause un préjudice parce que la qualité n'a pas été gérée, l'ingénieur peut être tenu responsable. La qualité n'est donc pas optionnelle.</p>
+    </div>
+
+    <div class="callout info">
+      <div class="icon">💡</div>
+      <div class="body">Le chapitre couvre deux grands thèmes : <strong>le coût de la qualité</strong> (pourquoi investir dans la qualité fait économiser de l'argent) et la <strong>culture qualité</strong> (comment créer un environnement où la qualité est une valeur partagée par toute l'équipe).</div>
+    </div>
+  </section>
+
+  <!-- ══════ ÉCHEC ══════ -->
+  <section class="section" id="echec">
+    <div class="section-header">
+      <span class="section-num">Contexte</span>
+      <h2>L'échec des projets logiciels — Rapport CHAOS</h2>
+    </div>
+
+    <p>Le <strong style="color:var(--text-bright)">Rapport CHAOS</strong> du Standish Group (1995) a analysé plus de 8 000 applications aux États-Unis. Il montre que l'industrie du logiciel a un problème majeur de qualité et de gestion de projets.</p>
+
+    <div class="callout warn">
+      <div class="icon">⚠️</div>
+      <div class="body">Ce rapport date de 1995 mais ses chiffres sont encore utilisés comme référence dans les cours de génie logiciel parce qu'ils illustrent une réalité persistante dans l'industrie, même si les proportions ont légèrement évolué depuis.</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card green">
+        <div class="num">16%</div>
+        <div class="label">Succès — respect total du budget, délai, et fonctionnalités prévues</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="num">53%</div>
+        <div class="label">Incomplets — dépassement de budget/délai OU fonctionnalités manquantes, mais livrés</div>
+      </div>
+      <div class="stat-card red">
+        <div class="num">31%</div>
+        <div class="label">Abandonnés — arrêtés complètement en cours de développement</div>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <div class="def-label">Définitions exactes du rapport CHAOS</div>
+      <p><strong>Succès :</strong> Projet livré dans les délais, dans le budget ET avec toutes les fonctionnalités prévues. Seulement 16% des projets y arrivent !<br><br>
+      <strong>Incomplet :</strong> Projet livré, mais avec dépassement de budget, de délai, et/ou des fonctionnalités manquantes. La note de cours précise « mais a été livré » — c'est important, le produit existe mais il n'est pas conforme à ce qui était prévu.<br><br>
+      <strong>Abandonné :</strong> Projet complètement arrêté avant la livraison. Tout l'argent investi est perdu.</p>
+    </div>
+
+    <p>La note du professeur sur le graphique indique : « motivation pour laquelle on fait de l'assurance qualité ». Ces chiffres catastrophiques sont la justification principale de toute la démarche qualité en génie logiciel.</p>
+  </section>
+
+  <!-- ══════ THÉRAC ══════ -->
+  <section class="section" id="therac">
+    <div class="section-header">
+      <span class="section-num">Cas #1</span>
+      <h2>Le Thérac-25 — Quand le logiciel tue</h2>
+    </div>
+
+    <p>Le Thérac-25 est l'un des cas les plus célèbres et les plus étudiés en éthique du génie logiciel. Il illustre de façon dramatique ce qui arrive quand la qualité est négligée dans un système critique.</p>
+
+    <div class="subsection">
+      <h3>Contexte</h3>
+      <p>Le Thérac-25 était une <strong>machine de radiothérapie</strong> utilisée pour traiter des patients atteints de cancer. Elle a été développée conjointement par :</p>
+      <ul style="margin-left: 24px; margin-bottom: 12px;">
+        <li><strong>EACL (Énergie Atomique du Canada Limitée)</strong> — côté canadien</li>
+        <li><strong>CGR Mev (France)</strong> — côté français</li>
+      </ul>
+      <p>La machine utilisait des faisceaux d'électrons ou de rayons X pour détruire les tumeurs. Le positionnement correct des composants internes était absolument critique : si le faisceau est envoyé sans que la cible soit en place, la dose de radiation est massivement amplifiée.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Ce qui s'est passé</h3>
+      <p>Entre 1985 et 1987, environ <strong>six accidents graves</strong> ont eu lieu. Des patients ont reçu des doses de radiation <strong>des centaines de fois supérieures</strong> à la dose thérapeutique prévue. Résultat : brûlures thermiques et radioactives sévères, décès.</p>
+      <div class="callout warn">
+        <div class="icon">☢️</div>
+        <div class="body">Le logiciel pilotant le Thérac-25 ne détectait pas que la cible n'était pas correctement positionnée. Il envoyait quand même le faisceau d'électrons à pleine puissance, directement sur le patient sans protection.</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Les causes d'erreurs (à mémoriser !)</h3>
+      <table>
+        <thead>
+          <tr><th>Cause</th><th>Explication détaillée</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Code non évalué indépendamment</strong></td>
+            <td>Le code source n'a jamais été relu par une équipe externe ou un organisme de certification indépendant. Les développeurs ont validé leur propre travail, ce qui est insuffisant pour un système de sécurité critique.</td>
+          </tr>
+          <tr>
+            <td><strong>Tests logiciels négligés</strong></td>
+            <td>Les étapes de test n'ont pas été réalisées correctement. Des bugs existaient dans le code mais n'avaient pas été détectés parce qu'on n'avait pas testé les bons scénarios.</td>
+          </tr>
+          <tr>
+            <td><strong>Documentation insuffisante</strong></td>
+            <td>La documentation du système n'expliquait pas clairement les codes d'erreur affichés. Le personnel médical ne comprenait pas les messages d'erreur et les ignorait.</td>
+          </tr>
+          <tr>
+            <td><strong>Plaintes ignorées</strong></td>
+            <td>Des opérateurs avaient signalé des comportements anormaux mais l'EACL n'avait pas pris ces plaintes au sérieux au début. C'est un problème de culture organisationnelle.</td>
+          </tr>
+          <tr>
+            <td><strong>Autres problèmes de conception</strong></td>
+            <td>Des erreurs fondamentales dans l'architecture du logiciel, notamment une mauvaise gestion de la synchronisation entre l'interface utilisateur et le matériel.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <div class="icon">📌</div>
+      <div class="body"><strong>Leçon principale :</strong> Ce cas illustre que dans les systèmes critiques, les conséquences des défauts logiciels peuvent être mortelles. La qualité logicielle n'est pas qu'une question de performance ou de coût — c'est une question de vie ou de mort.</div>
+    </div>
+  </section>
+
+  <!-- ══════ BOEING ══════ -->
+  <section class="section" id="boeing">
+    <div class="section-header">
+      <span class="section-num">Cas #2</span>
+      <h2>Boeing 737 Max — Leçons managériales et techniques</h2>
+    </div>
+
+    <div class="subsection">
+      <h3>Les faits</h3>
+      <p>Deux crashs ont causé la mort de <strong>346 personnes</strong> :</p>
+      <ul style="margin-left: 24px; margin-bottom: 12px;">
+        <li><strong>Lion Air Flight 610</strong> — octobre 2018, Indonésie</li>
+        <li><strong>Ethiopian Airlines Flight 302</strong> — mars 2019, Éthiopie</li>
+      </ul>
+      <p>Les deux avions ont perdu de l'altitude dans les premières minutes de leur vol. La flotte mondiale de 737 Max a été immobilisée pendant 20 mois.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Le système MCAS — La cause technique</h3>
+      <div class="def-box">
+        <div class="def-label">MCAS — Maneuvering Characteristics Augmentation System</div>
+        <p>Système conçu pour <strong>empêcher l'avion de décrocher</strong> (stall) en prenant un angle de montée trop élevé. En détectant un angle d'attaque dangereux, il abaissait automatiquement le nez de l'avion.<br><br>
+        Le problème : il se basait sur <strong>un seul capteur</strong> d'angle d'attaque, sans redondance. Si ce capteur donnait une fausse lecture, le MCAS plongeait l'avion vers le bas en répétant l'action, sans que le pilote puisse facilement l'annuler.</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Les facteurs contributifs</h3>
+      <table>
+        <thead>
+          <tr><th>Facteur</th><th>Détail</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Formation inadéquate</strong></td>
+            <td>Pas de formation sur simulateur de vol. Les pilotes ont reçu leur formation sur... une tablette iPad. Aucun scénario de panne du MCAS n'avait été pratiqué.</td>
+          </tr>
+          <tr>
+            <td><strong>Documentation insuffisante</strong></td>
+            <td>Le manuel de vol ne mentionnait pas clairement le MCAS, ni la procédure pour le désactiver. Le pilote du Lion Air cherchait la solution dans la documentation pendant le crash.</td>
+          </tr>
+          <tr>
+            <td><strong>Temps de réaction insuffisant</strong></td>
+            <td>Le pilote n'avait que <strong>40 secondes</strong> pour identifier le problème et désactiver le MCAS manuellement.</td>
+          </tr>
+          <tr>
+            <td><strong>Signaux d'alerte ignorés</strong></td>
+            <td>Des ingénieurs avaient émis des plaintes officielles sur la sécurité. L'un d'eux a écrit : « Mettrais-tu ta famille dans un avion testé sur simulateur Boeing 737 MAX ? Moi, je ne le ferais pas. » — écrit 8 mois avant le premier crash.</td>
+          </tr>
+          <tr>
+            <td><strong>Essais inadéquats</strong></td>
+            <td>En quelques minutes de test sur simulateur, le problème survenait systématiquement. Les tests auraient pu détecter le bug facilement s'ils avaient été faits correctement.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Leçons apprises — Les 3 grandes erreurs conceptuelles</h3>
+
+      <h4>Leçon 1 : Trop de confiance dans le logiciel du modèle précédent</h4>
+      <p>Boeing pensait qu'une modification d'un produit mature (le 737 existait depuis les années 1960) n'exigeait pas autant de rigueur qu'un produit entièrement nouveau. <strong>C'est une erreur dangereuse.</strong> Chaque modification majeure doit être traitée avec la même rigueur qu'un nouveau système.</p>
+
+      <h4>Leçon 2 : Conception défensive très faible</h4>
+      <div class="def-box">
+        <div class="def-label">Conception défensive (Defensive Design)</div>
+        <p>Approche de développement qui anticipe les erreurs et les conditions anormales. Un système défensif inclut : auto-vérifications, détections d'erreurs, mécanismes de reprise en cas d'erreur, redondance des capteurs critiques, alertes claires pour l'opérateur.<br><br>
+        Le MCAS n'avait aucun de ces mécanismes. Un seul capteur, sans vérification croisée, sans alerte claire, sans procédure de récupération simple.</p>
+      </div>
+
+      <h4>Leçon 3 : Confusion entre fiabilité et sécurité</h4>
+      <p>Boeing raisonnait ainsi : « Le 737 a volé des milliers de fois sans problème, donc il est sécuritaire. » C'est une confusion fondamentale entre deux concepts distincts :</p>
+
+      <table>
+        <thead>
+          <tr><th>Fiabilité</th><th>Sécurité</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Définition :</strong> Capacité à fonctionner correctement dans des conditions normales sur une période donnée.</td>
+            <td><strong>Définition :</strong> Protection contre des événements dangereux, incluant les conditions anormales et les attaques.</td>
+          </tr>
+          <tr>
+            <td><strong>Question :</strong> « Est-ce que ça marche bien quand tout va bien ? »</td>
+            <td><strong>Question :</strong> « Est-ce que ça reste sûr quand quelque chose tourne mal ? »</td>
+          </tr>
+          <tr>
+            <td><strong>Mesures :</strong> Temps moyen entre pannes (MTBF), taux de défaillance, tests de performance.</td>
+            <td><strong>Mesures :</strong> Analyse de vulnérabilités, audits de sécurité, tests de pénétration, analyse de modes de défaillance.</td>
+          </tr>
+          <tr>
+            <td><strong>Exemple :</strong> Un avion qui vole 10 000 fois sans panne est très fiable.</td>
+            <td><strong>Exemple :</strong> Ce même avion est-il sécuritaire si un capteur tombe en panne ? Si le MCAS reçoit une mauvaise donnée ?</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn">
+        <div class="icon">⚠️</div>
+        <div class="body"><strong>Piège d'examen fréquent :</strong> Un système peut être très fiable (rarement en panne dans des conditions normales) mais pas du tout sécuritaire (catastrophique en cas de condition anormale). La fiabilité ne garantit pas la sécurité.</div>
+      </div>
+
+      <h4>Leçon 4 : Gestionnaires arrogants et incompétents</h4>
+      <p>Le cours identifie spécifiquement des comportements managériaux qui ont contribué au désastre :</p>
+      <ul style="margin-left: 24px;">
+        <li><strong>Pression de mise sur le marché rapide</strong> — Boeing perdait des parts de marché face à Airbus et voulait sortir le 737 Max rapidement.</li>
+        <li><strong>Sous-traitance du développement logiciel à des développeurs mal payés</strong> (à 9$/h, mentionné dans les notes).</li>
+        <li><strong>Mépris de l'expertise des seniors</strong> — les ingénieurs expérimentés qui soulevaient des problèmes étaient ignorés.</li>
+        <li><strong>Culture de la peur</strong> — les employés qui signalaient des problèmes subissaient des pressions pour se taire.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════ COÛT QUALITÉ ══════ -->
+  <section class="section" id="cout-qualite">
+    <div class="section-header">
+      <span class="section-num">4.2</span>
+      <h2>Le coût de la qualité</h2>
+    </div>
+
+    <p>La qualité a un coût, mais <strong style="color:var(--text-bright)">l'absence de qualité coûte encore plus cher</strong>. Le coût total d'un projet logiciel se décompose ainsi :</p>
+
+    <div class="callout info">
+      <div class="icon">📐</div>
+      <div class="body"><strong>Formule fondamentale :</strong><br>
+      <code style="font-family: 'IBM Plex Mono'; font-size: 15px; color: var(--accent)">Coût du projet = Réalisation + Défaillances + Évaluation + Prévention</code></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Les 3 catégories de coûts de qualité</h3>
+
+      <h4>1. Coûts de prévention</h4>
+      <div class="def-box">
+        <div class="def-label">Définition</div>
+        <p>Dépenses effectuées <strong>avant</strong> que les erreurs surviennent, pour les empêcher de se produire.</p>
+      </div>
+      <p>Exemples concrets : formation des développeurs, amélioration des processus, collecte de métriques, définition de critères de succès, mise en place de normes de qualité, outils d'analyse statique de code.</p>
+
+      <h4>2. Coûts de détection (évaluation)</h4>
+      <div class="def-box">
+        <div class="def-label">Définition</div>
+        <p>Dépenses pour <strong>vérifier et évaluer</strong> le produit à chaque étape du développement — pour trouver les erreurs qui existent malgré les mesures de prévention.</p>
+      </div>
+      <p>Exemples concrets : tests unitaires, tests d'intégration, tests d'acceptation, revues de code, inspections techniques, audits de qualité, assurance qualité logicielle.</p>
+
+      <h4>3. Coûts de défaillance (non-conformité)</h4>
+      <table>
+        <thead>
+          <tr><th>Type</th><th>Définition</th><th>Exemples</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Défaillance interne</strong></td>
+            <td>Problèmes détectés <em>avant</em> la livraison au client</td>
+            <td>Reprises, corrections, nouveaux tests à effectuer, révision de la documentation</td>
+          </tr>
+          <tr>
+            <td><strong>Défaillance externe</strong></td>
+            <td>Problèmes découverts <em>après</em> la livraison au client</td>
+            <td>Support technique, enquêtes de plaintes, correctifs, mises à jour d'urgence</td>
+          </tr>
+          <tr>
+            <td><strong>Préjudice commercial</strong></td>
+            <td>Dommages à l'image et perte de clients</td>
+            <td>Réputation dégradée, perte de contrats futurs, poursuites légales</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Le graphique des compromis coût-qualité</h3>
+      <p>Le graphique du cours montre une courbe en U : il existe un <strong>niveau optimal de qualité</strong> qui minimise le coût total. Trop peu d'investissement en prévention/détection = beaucoup de défaillances (coûteux). Trop d'investissement = on dépense plus que ce qu'on économise.</p>
+      <div class="callout info">
+        <div class="icon">📊</div>
+        <div class="body">L'objectif n'est pas la qualité parfaite à tout prix, mais le <strong>niveau de qualité optimal</strong> qui minimise le coût total. Ce point d'équilibre est différent selon le type de logiciel (critique vs. application web de gestion).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PROPAGATION ══════ -->
+  <section class="section" id="propagation">
+    <div class="section-header">
+      <span class="section-num">Concept clé</span>
+      <h2>Coût de propagation des erreurs — La règle d'or</h2>
+    </div>
+
+    <p>C'est l'un des concepts les plus importants du chapitre, régulièrement évalué. Plus on attend pour corriger un défaut, plus le coût de correction explose.</p>
+
+    <div class="cost-bar-wrap">
+      <div style="font-size: 12px; font-family: 'IBM Plex Mono'; color: var(--text-dim); margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase;">Coût de correction d'un défaut selon la phase (Boehm 2001)</div>
+      <div class="cost-bar-row">
+        <div class="cost-bar-label">Conception & programmation</div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:1%; background:var(--accent3)"></div></div>
+        <div class="cost-bar-val">$139</div>
+      </div>
+      <div class="cost-bar-row">
+        <div class="cost-bar-label">Compilation & assemblage</div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:3.1%; background:var(--accent3)"></div></div>
+        <div class="cost-bar-val">$455</div>
+      </div>
+      <div class="cost-bar-row">
+        <div class="cost-bar-label">Tests d'intégration</div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:6.7%; background:var(--accent2)"></div></div>
+        <div class="cost-bar-val">$977</div>
+      </div>
+      <div class="cost-bar-row">
+        <div class="cost-bar-label">Tests d'acceptation</div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:49.5%; background:var(--accent2)"></div></div>
+        <div class="cost-bar-val">$7 136</div>
+      </div>
+      <div class="cost-bar-row">
+        <div class="cost-bar-label">Après livraison</div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:100%; background:var(--accent4)"></div></div>
+        <div class="cost-bar-val">$14 402</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="icon">📈</div>
+      <div class="body">Un défaut qui coûte <strong>$139 à corriger pendant la conception</strong> coûte <strong>$14 402 une fois le logiciel livré</strong> — soit <strong>103 fois plus cher</strong>. La note du professeur sur le graphique indique : « C'est pas toujours comme ça, mais ça peut arriver. »</div>
+    </div>
+
+    <div class="subsection">
+      <h3>La règle des coûts relatifs (Boehm 1981 / Grady 1999)</h3>
+      <p>Si une erreur au niveau des exigences coûte <strong>1$</strong> à corriger au moment où elle est introduite :</p>
+      <table>
+        <thead>
+          <tr><th>Phase de découverte</th><th>Coût relatif</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pendant la phase des exigences</td><td style="color:var(--accent3); font-family:'IBM Plex Mono'">1$</td></tr>
+          <tr><td>Pendant la conception</td><td style="color:var(--accent2); font-family:'IBM Plex Mono'">3–4$</td></tr>
+          <tr><td>Pendant le codage</td><td style="color:var(--accent2); font-family:'IBM Plex Mono'">~5–10$</td></tr>
+          <tr><td>Après déploiement</td><td style="color:var(--accent4); font-family:'IBM Plex Mono'">100$</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════ INJECTION ══════ -->
+  <section class="section" id="injection">
+    <div class="section-header">
+      <span class="section-num">Concept clé</span>
+      <h2>Injection des défauts pendant le développement</h2>
+    </div>
+
+    <p>Selon Selby (2007), voici où les erreurs sont <strong>réellement introduites</strong> dans le code :</p>
+
+    <div class="callout warn">
+      <div class="icon">🔍</div>
+      <div class="body"><strong>Le constat choc :</strong> <strong>70% des erreurs sont faites avant la phase de codage !</strong> — La majorité des bugs ne viennent pas du code lui-même, mais des erreurs de conception et de spécification en amont.</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Phase de développement</th><th>% des défauts injectés</th><th>Interprétation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Spécifications des exigences</td><td style="color:var(--accent4);font-family:'IBM Plex Mono';font-weight:600">49.1%</td><td>La moitié des bugs viennent de là ! Exigences mal définies, ambiguës, incomplètes.</td></tr>
+        <tr><td>Conception détaillée</td><td style="color:var(--accent2);font-family:'IBM Plex Mono'">12.1%</td><td>Architecture et design incorrects</td></tr>
+        <tr><td>Codage</td><td style="font-family:'IBM Plex Mono'">11.7%</td><td>Erreurs classiques de programmation</td></tr>
+        <tr><td>Vérification</td><td style="font-family:'IBM Plex Mono'">10.6%</td><td>Erreurs introduites pendant les activités de vérification</td></tr>
+        <tr><td>Conception préliminaire</td><td style="font-family:'IBM Plex Mono'">9.0%</td><td>Architecture de haut niveau mal pensée</td></tr>
+        <tr><td>Tests unitaires</td><td style="font-family:'IBM Plex Mono'">2.5%</td><td>Peu d'erreurs injectées ici</td></tr>
+        <tr><td>Exigences du client</td><td style="font-family:'IBM Plex Mono'">2.3%</td><td>Mauvaise compréhension du client</td></tr>
+        <tr><td>Autres phases</td><td style="font-family:'IBM Plex Mono'">≤2%</td><td>Intégration, support, maintenance, opérations</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <div class="icon">💡</div>
+      <div class="body"><strong>Implication directe :</strong> Puisque la majorité des erreurs viennent des phases d'analyse et de conception, et que ces erreurs sont exponentiellement plus chères à corriger plus tard, il faut investir massivement dans la qualité des exigences et de la conception, pas uniquement dans les tests.</div>
+    </div>
+  </section>
+
+  <!-- ══════ QUALITÉ DEF ══════ -->
+  <section class="section" id="qualite-def">
+    <div class="section-header">
+      <span class="section-num">Définitions</span>
+      <h2>Qu'est-ce que la qualité logicielle ?</h2>
+    </div>
+
+    <div class="def-box">
+      <div class="def-label">Définition ISO 9001</div>
+      <p>« The degree to which a set of inherent characteristics fulfills requirements. »<br>
+      En français : <strong>le degré auquel un ensemble de caractéristiques inhérentes satisfait les exigences.</strong></p>
+    </div>
+
+    <div class="subsection">
+      <h3>Pour qu'un logiciel soit de qualité, il doit :</h3>
+      <ul style="margin-left: 24px;">
+        <li><strong>Satisfaire les exigences spécifiées</strong> — conformité aux specs techniques</li>
+        <li><strong>Satisfaire les besoins du client/utilisateurs</strong> — utilité réelle, pas juste conformité formelle</li>
+        <li><strong>Respecter le budget et le délai de livraison</strong> — la qualité inclut la gestion de projet</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Ce que la qualité couvre</h3>
+      <ul style="margin-left: 24px;">
+        <li>Le <strong>processus</strong> de développement et de maintenance</li>
+        <li>Le <strong>code source</strong></li>
+        <li>La <strong>documentation</strong></li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Contrôle de qualité vs Assurance qualité</h3>
+      <table>
+        <thead>
+          <tr><th></th><th>Contrôle de qualité (CQ)</th><th>Assurance qualité (AQ)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Quand</strong></td>
+            <td>À la fin, quand le produit est terminé</td>
+            <td>Tout au long du processus de développement</td>
+          </tr>
+          <tr>
+            <td><strong>Quoi</strong></td>
+            <td>Vérifier si le produit fini est acceptable avant livraison</td>
+            <td>Prévenir les erreurs, les détecter tôt, les corriger</td>
+          </tr>
+          <tr>
+            <td><strong>Relation</strong></td>
+            <td colspan="2">Le CQ est <em>une activité incluse dans</em> l'AQ. L'AQ est le cadre global.</td>
+          </tr>
+          <tr>
+            <td><strong>Analogie</strong></td>
+            <td>Tester la nourriture avant de servir le plat</td>
+            <td>Choisir les bons ingrédients, suivre la recette, goûter pendant la cuisson</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════ V&V ══════ -->
+  <section class="section" id="vv">
+    <div class="section-header">
+      <span class="section-num">Concept clé</span>
+      <h2>Vérification & Validation (V&V)</h2>
+    </div>
+
+    <div class="def-box">
+      <div class="def-label">Objectif selon IEEE-1012</div>
+      <p>« Le but de la V&V est d'aider l'entreprise de développement à bâtir la qualité dans le logiciel tout au long de son cycle de vie. »</p>
+    </div>
+
+    <div class="subsection">
+      <h3>La distinction fondamentale</h3>
+      <table>
+        <thead>
+          <tr><th></th><th>Vérification</th><th>Validation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Question posée</strong></td>
+            <td>« Avons-nous <em>bien</em> construit le système ? »</td>
+            <td>« Avons-nous construit le <em>bon</em> système ? »</td>
+          </tr>
+          <tr>
+            <td><strong>Formule anglaise</strong></td>
+            <td><em>Building the system right</em></td>
+            <td><em>Building the right system</em></td>
+          </tr>
+          <tr>
+            <td><strong>Référence</strong></td>
+            <td>Compare le produit aux <strong>spécifications</strong></td>
+            <td>Compare le produit aux <strong>besoins réels</strong> du client</td>
+          </tr>
+          <tr>
+            <td><strong>Exemple</strong></td>
+            <td>« Le code compile-t-il ? Les tests unitaires passent-ils ? Respecte-t-on les normes de codage ? »</td>
+            <td>« Est-ce que l'utilisateur peut vraiment accomplir ses tâches avec ce logiciel ? Est-ce que ça résout son problème ? »</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout info">
+        <div class="icon">💡</div>
+        <div class="body"><strong>Piège classique :</strong> Un logiciel peut passer tous les tests (vérification = OK) mais ne pas répondre aux vrais besoins du client (validation = échec). Les deux sont nécessaires et complémentaires.</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Les activités d'assurance qualité incluent</h3>
+      <ul style="margin-left: 24px;">
+        <li><strong>Validation et vérification</strong> — le cadre global</li>
+        <li><strong>Revue des exigences</strong> — vérifier que les specs sont complètes, cohérentes, vérifiables</li>
+        <li><strong>Inspection technique</strong> — revue formelle du code ou des documents par des pairs</li>
+        <li><strong>Tester les exigences</strong> — s'assurer que chaque exigence peut être testée</li>
+        <li><strong>Valider les exigences avec critères d'acceptation</strong> — définir en avance comment on saura que c'est bon</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Réponse à la question : « Quand faire la V&V et pourquoi ? »</h3>
+      <p>On fait la V&V <strong>tout au long du cycle de développement</strong>, pas seulement à la fin. Pourquoi ?</p>
+      <ul style="margin-left: 24px;">
+        <li>Parce que 70% des erreurs sont injectées avant le codage — il faut les trouver tôt</li>
+        <li>Parce que le coût de correction explose exponentiellement plus on attend</li>
+        <li>Parce qu'une erreur dans les exigences va se propager à la conception, puis au code, puis aux tests — une erreur au départ devient des dizaines d'erreurs plus tard</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3>Réponse à la question de l'étude de cas (PO qui refuse l'AQ)</h3>
+      <p>Pour convaincre un Product Owner que les activités d'AQ sont rentables, même pour des petits projets :</p>
+      <div class="callout success">
+        <div class="icon">💬</div>
+        <div class="body">
+          <strong>Arguments à utiliser :</strong><br><br>
+          1. <strong>Argument économique :</strong> Corriger un bug après livraison coûte 100x plus cher que de le trouver pendant les exigences. Sur un petit projet, même un seul bug majeur après livraison peut dépasser tout le coût de l'AQ.<br><br>
+          2. <strong>Argument statistique :</strong> 84% des projets échouent ou sont incomplets (Rapport CHAOS). L'AQ augmente statistiquement les chances de succès.<br><br>
+          3. <strong>Argument de réputation :</strong> Un bug livré au client coûte non seulement du temps de correction, mais aussi la confiance du client (coût commercial difficile à quantifier).<br><br>
+          4. <strong>L'AQ se scale selon la taille :</strong> Pour un petit projet, l'AQ ne doit pas être lourde — quelques revues informelles, des tests unitaires, une vérification des exigences. Le niveau d'AQ est proportionnel au risque, pas à la taille du Boeing 737.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ CULTURE ══════ -->
+  <section class="section" id="culture">
+    <div class="section-header">
+      <span class="section-num">4.3</span>
+      <h2>La culture qualité</h2>
+    </div>
+
+    <div class="def-box">
+      <div class="def-label">Définition — Culture de génie logiciel (Wiegers 1996)</div>
+      <p>« Les interactions entre les comportements, les activités, les priorités et les décisions d'un individu et d'un organisme. »<br><br>
+      En clair : la culture qualité, c'est <strong>la façon dont tout le monde dans l'organisation pense et agit par rapport à la qualité</strong> — pas seulement les règles écrites, mais les comportements réels au quotidien.</p>
+    </div>
+
+    <div class="subsection">
+      <h3>Les 3 niveaux d'engagement selon Wiegers</h3>
+      <p>Une culture saine nécessite un engagement à trois niveaux simultanément :</p>
+      <table>
+        <thead>
+          <tr><th>Niveau</th><th>Acteur</th><th>Ce qu'il faut</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Personnel</strong></td>
+            <td>Chaque chef de projet</td>
+            <td>Engagement personnel à créer des projets de qualité en appliquant systématiquement les bonnes pratiques</td>
+          </tr>
+          <tr>
+            <td><strong>Organisationnel</strong></td>
+            <td>Gestionnaires de tous niveaux</td>
+            <td>Fournir un environnement où la qualité est un facteur fondamental de succès, et permettre à chaque développeur d'atteindre cet objectif</td>
+          </tr>
+          <tr>
+            <td><strong>Équipe</strong></td>
+            <td>Tous les membres</td>
+            <td>Engagement à améliorer continuellement les processus ET les produits créés</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Le modèle d'interactions (diagramme du cours)</h3>
+      <p>Le diagramme de Wiegers montre que la culture de génie logiciel n'est pas un élément isolé mais le résultat d'interactions mutuelles entre :</p>
+      <ul style="margin-left: 24px;">
+        <li><strong>Les objectifs du projet</strong> → impliquent des pratiques technologiques</li>
+        <li><strong>Les pratiques technologiques</strong> → renforcent la culture</li>
+        <li><strong>La culture de génie logiciel</strong> → aide à établir les priorités des gestionnaires</li>
+        <li><strong>Les priorités des gestionnaires</strong> → définissent les objectifs du projet</li>
+        <li><strong>Les actions de chacun</strong> → renforcent la culture</li>
+      </ul>
+      <div class="callout info">
+        <div class="icon">🔄</div>
+        <div class="body">C'est un système circulaire : la culture influence les comportements qui renforcent la culture. C'est pourquoi il est difficile de changer une mauvaise culture — et c'est pourquoi il faut agir à tous les niveaux simultanément.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 14 PRINCIPES ══════ -->
+  <section class="section" id="principes">
+    <div class="section-header">
+      <span class="section-num">4.3</span>
+      <h2>Les 14 principes culturels de Wiegers</h2>
+    </div>
+
+    <p>Wiegers propose 14 principes qui constituent la base d'une bonne culture de génie logiciel. Voici chacun expliqué :</p>
+
+    <ol class="principles-list">
+      <li>
+        <div class="num">01</div>
+        <div><strong>Ne jamais laisser votre patron ou votre client vous inciter à faire un mauvais travail.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">La pression commerciale ou hiérarchique ne justifie pas de négliger la qualité. C'est une responsabilité professionnelle et éthique de l'ingénieur. Le cas Boeing illustre parfaitement ce qui arrive quand on cède.</span></div>
+      </li>
+      <li>
+        <div class="num">02</div>
+        <div><strong>Les personnes doivent sentir que le travail qu'elles effectuent est apprécié.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">La motivation intrinsèque des développeurs est un facteur de qualité. Si le travail bien fait n'est pas reconnu, les gens s'en désintéressent.</span></div>
+      </li>
+      <li>
+        <div class="num">03</div>
+        <div><strong>L'éducation continue est la responsabilité de chaque membre d'équipe.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Le domaine logiciel évolue vite. Se former en continu n'est pas optionnel — c'est une responsabilité personnelle et professionnelle.</span></div>
+      </li>
+      <li>
+        <div class="num">04</div>
+        <div><strong>La participation du client est le facteur le plus critique de la qualité logicielle.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Un logiciel peut être techniquement parfait mais inutile si on n'implique pas le client. C'est directement lié à la validation.</span></div>
+      </li>
+      <li>
+        <div class="num">05</div>
+        <div><strong>Votre plus grand défi est de partager la vision du produit final avec le client.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">L'une des principales sources d'erreurs (49,1% !) vient d'une mauvaise compréhension des exigences. Créer une vision partagée dès le départ est fondamental.</span></div>
+      </li>
+      <li>
+        <div class="num">06</div>
+        <div><strong>L'amélioration continue du processus est possible et essentielle.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Aucun processus n'est parfait. Mesurer, analyser et améliorer constamment est la base de l'excellence opérationnelle (cf. ISO 9001, CMMI).</span></div>
+      </li>
+      <li>
+        <div class="num">07</div>
+        <div><strong>Les procédures de développement logiciel peuvent aider à établir une culture commune.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Les standards et procédures ne sont pas de la bureaucratie — ce sont des vecteurs de partage de bonnes pratiques au sein de l'équipe.</span></div>
+      </li>
+      <li>
+        <div class="num">08</div>
+        <div><strong>La qualité est la première priorité ; la productivité à long terme est une conséquence normale de la qualité.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Paradoxe apparent : investir dans la qualité semble ralentir. Mais à long terme, moins de corrections = plus de productivité effective.</span></div>
+      </li>
+      <li>
+        <div class="num">09</div>
+        <div><strong>Tâcher que ce soit un pair, plutôt qu'un client, qui trouve un défaut.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Il vaut mieux qu'un collègue trouve le bug en revue de code que que le client le découvre en production. C'est l'essence de la défaillance interne vs externe.</span></div>
+      </li>
+      <li>
+        <div class="num">10</div>
+        <div><strong>On réitère sur toutes les étapes sauf le codage — on ne code qu'une fois.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Il faut itérer beaucoup sur les exigences, la conception, les tests — mais quand on code, c'est parce qu'on a bien réfléchi en amont. Cela rejoint la règle du 49,1% d'erreurs dans les spécifications.</span></div>
+      </li>
+      <li>
+        <div class="num">11</div>
+        <div><strong>Contrôler les rapports d'erreurs et les demandes de changement est essentiel.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Un système de suivi des bugs et des changements est indispensable. Sans traçabilité, on ne peut pas gérer la qualité ni comprendre les sources de problèmes.</span></div>
+      </li>
+      <li>
+        <div class="num">12</div>
+        <div><strong>Si vous mesurez ce que vous faites, vous pouvez apprendre à le faire mieux.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Principe de gestion fondamental. On ne peut améliorer que ce qu'on mesure. Les métriques logicielles (densité de défauts, couverture de tests, vélocité) sont des outils d'amélioration.</span></div>
+      </li>
+      <li>
+        <div class="num">13</div>
+        <div><strong>Faites ce qui semble raisonnable ; ne recourez pas aux dogmes.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">L'ingénierie logicielle n'est pas une religion. Les méthodes et outils doivent être adaptés au contexte. Une méthodologie qui fonctionne pour un projet peut être inadaptée pour un autre.</span></div>
+      </li>
+      <li>
+        <div class="num">14</div>
+        <div><strong>Vous ne pouvez pas tout changer en même temps. Identifiez les changements qui rapporteront les plus grands avantages et commencez lundi prochain.</strong><br>
+        <span style="color:var(--text-dim); font-size:14px">Pragmatisme. L'amélioration continue se fait par petits pas priorisés. Identifier le changement à plus grand impact et le mettre en œuvre immédiatement.</span></div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ══════ 5 DIMENSIONS ══════ -->
+  <section class="section" id="dimensions">
+    <div class="section-header">
+      <span class="section-num">4.4</span>
+      <h2>Les cinq dimensions d'un projet logiciel</h2>
+    </div>
+
+    <p>Tout projet logiciel est défini par cinq dimensions qui sont en tension constante. On ne peut généralement pas maximiser toutes les cinq simultanément — il faut faire des compromis.</p>
+
+    <div class="pentagon-wrap">
+      <div class="pentagon-svg-area">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <polygon points="110,10 205,78 172,185 48,185 15,78" fill="rgba(91,141,238,0.08)" stroke="#5b8dee" stroke-width="1.5"/>
+          <!-- labels -->
+          <text x="110" y="7" text-anchor="middle" fill="#62d4a0" font-size="12" font-family="IBM Plex Mono" font-weight="600">Fonctionnalités</text>
+          <text x="212" y="82" text-anchor="start" fill="#e8a04e" font-size="12" font-family="IBM Plex Mono" font-weight="600">Qualité</text>
+          <text x="175" y="200" text-anchor="middle" fill="#e06c6c" font-size="12" font-family="IBM Plex Mono" font-weight="600">Coût</text>
+          <text x="48" y="200" text-anchor="middle" fill="#a78fe8" font-size="12" font-family="IBM Plex Mono" font-weight="600">Échéance</text>
+          <text x="5" y="82" text-anchor="start" fill="#5b8dee" font-size="12" font-family="IBM Plex Mono" font-weight="600">Personnel</text>
+        </svg>
+      </div>
+      <div class="pentagon-legend">
+        <h4>Les 5 dimensions</h4>
+        <div class="dim-row"><div class="dim-dot" style="background:#62d4a0"></div><strong>Fonctionnalités</strong> — Ce que le logiciel fait, ses features</div>
+        <div class="dim-row"><div class="dim-dot" style="background:#e8a04e"></div><strong>Qualité</strong> — Fiabilité, performance, maintenabilité</div>
+        <div class="dim-row"><div class="dim-dot" style="background:#e06c6c"></div><strong>Coût</strong> — Budget alloué au projet</div>
+        <div class="dim-row"><div class="dim-dot" style="background:#a78fe8"></div><strong>Échéance</strong> — Date limite de livraison</div>
+        <div class="dim-row"><div class="dim-dot" style="background:#5b8dee"></div><strong>Personnel</strong> — Taille et composition de l'équipe</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>Les 3 rôles possibles pour chaque dimension</h3>
+      <table>
+        <thead>
+          <tr><th>Rôle</th><th>Définition</th><th>Flexibilité</th><th>Exemple</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Objectif (Driver)</strong></td>
+            <td>Raison spécifique et importante pour laquelle le projet doit être réalisé. Contrainte absolue.</td>
+            <td style="color:var(--accent4)">Aucune flexibilité</td>
+            <td>« La date du 31 décembre est imposée par la loi » → l'échéance est un objectif absolu</td>
+          </tr>
+          <tr>
+            <td><strong>Contrainte</strong></td>
+            <td>Facteur externe non contrôlable par le chef de projet.</td>
+            <td style="color:var(--accent2)">Très peu de flexibilité</td>
+            <td>« Le budget a été approuvé par le conseil d'administration pour 200k$ »</td>
+          </tr>
+          <tr>
+            <td><strong>Degré de liberté</strong></td>
+            <td>Ce qui n'est ni objectif ni contrainte — ce sur quoi on peut négocier.</td>
+            <td style="color:var(--accent3)">Grande flexibilité</td>
+            <td>« On peut livrer 60% à 90% des fonctionnalités en version 1.0 »</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>Le graphique radar (pentagone avec échelle de 0 à 10)</h3>
+      <p>On peut représenter les compromis d'un projet avec un graphique radar où :</p>
+      <ul style="margin-left: 24px; margin-bottom: 12px;">
+        <li><strong>0</strong> = contrainte absolue (aucune flexibilité)</li>
+        <li><strong>10</strong> = liberté totale</li>
+      </ul>
+      <p>Exemple du cours :</p>
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Score</th><th>Interprétation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Personnel</td><td style="font-family:'IBM Plex Mono'; color:var(--accent4)">1 / 10</td><td>Taille d'équipe fixe — pas question d'ajouter des personnes</td></tr>
+          <tr><td>Échéance</td><td style="font-family:'IBM Plex Mono'; color:var(--accent4)">2 / 10</td><td>Date quasi imposée — très peu de marge</td></tr>
+          <tr><td>Qualité</td><td style="font-family:'IBM Plex Mono'; color:var(--accent2)">4 / 10</td><td>La v1.0 peut contenir quelques défauts connus — un peu de flexibilité</td></tr>
+          <tr><td>Coût</td><td style="font-family:'IBM Plex Mono'; color:var(--accent2)">5 / 10</td><td>Budget principalement lié aux salaires — modérément flexible</td></tr>
+          <tr><td>Fonctionnalités</td><td style="font-family:'IBM Plex Mono'; color:var(--accent3)">9 / 10</td><td>L'équipe choisit quelles fonctionnalités prioriser — grande liberté</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>La négociation d'un projet logiciel</h3>
+      <p>Le tableau de négociation du cours montre comment on formalise les compromis :</p>
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Objectif</th><th>Contrainte</th><th>Degré de liberté</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Coûts</td><td></td><td></td><td>20% d'écart acceptable</td></tr>
+          <tr><td>Fonctionnalités</td><td></td><td></td><td>60% à 90% des fonctionnalités priorité 1 en v1.0</td></tr>
+          <tr><td>Qualité</td><td></td><td></td><td>La v1.0 peut contenir jusqu'à 5 défauts majeurs connus</td></tr>
+          <tr><td>Échéance</td><td>Version 1.0 livrée dans 4 mois</td><td></td><td></td></tr>
+          <tr><td>Personnel</td><td></td><td>4 personnes</td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="callout info">
+        <div class="icon">🤝</div>
+        <div class="body">Ce tableau doit être <strong>négocié et signé avec le client</strong>. Il rend explicites les compromis qui sont souvent implicites et source de malentendus. C'est un outil de gestion des attentes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ QUESTIONS D'EXAMEN ══════ -->
+  <div class="exam-section" id="exam">
+    <h2>🎯 Questions susceptibles de sortir à l'examen</h2>
+
+    <div class="exam-q">
+      <div class="q-num">Question 01 — Cas pratique</div>
+      <div class="q-text">Vous êtes dans une organisation où le Product Owner affirme que les activités d'assurance qualité « ajoutent des coûts inutiles » sur des petits projets. Quels arguments concrets utiliseriez-vous pour le convaincre du contraire ? Appuyez-vous sur les données vues au cours.</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>Argument 1 — Coût de la propagation des erreurs (Boehm 2001) :</strong> Un défaut corrigé en phase de conception coûte $139. Le même défaut corrigé après livraison coûte $14 402, soit 103× plus cher. Même sur un petit projet, un seul bug critique post-livraison peut dépasser le coût total d'un programme d'AQ.<br><br>
+          <strong>Argument 2 — 70% des erreurs avant le codage :</strong> La majorité des bugs viennent des spécifications (49,1% selon Selby 2007). Des revues légères d'exigences — activité d'AQ peu coûteuse — permettent d'attraper ces erreurs tôt.<br><br>
+          <strong>Argument 3 — Rapport CHAOS :</strong> Seulement 16% des projets logiciels sont considérés comme un succès complet. L'AQ est l'un des facteurs différenciateurs.<br><br>
+          <strong>Argument 4 — L'AQ se scale :</strong> Pour un petit projet, l'AQ n'est pas un processus lourd de type Boeing. Une simple revue de code entre collègues, des tests unitaires et une checklist d'exigences constituent déjà une AQ efficace et peu coûteuse.
+        </div>
+      </details>
+    </div>
+
+    <div class="exam-q">
+      <div class="q-num">Question 02 — Définitions</div>
+      <div class="q-text">Expliquez la différence entre fiabilité et sécurité logicielle. Donnez un exemple concret où un système est fiable mais pas sécuritaire.</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>Fiabilité :</strong> Capacité du logiciel à fonctionner correctement dans des conditions normales sur une période donnée. Mesure : temps moyen entre pannes (MTBF), taux de défaillance.<br><br>
+          <strong>Sécurité :</strong> Protection contre des événements dangereux — accès non autorisés, cyberattaques, conditions anormales, défaillances critiques. But : protéger confidentialité, intégrité, disponibilité.<br><br>
+          <strong>Exemple :</strong> Le Boeing 737 Max était très fiable — il avait volé des milliers de fois sans problème. Mais il n'était pas sécuritaire : le système MCAS pouvait plonger l'avion en cas de lecture erronée d'un capteur, sans mécanisme de protection adéquat. Boeing a confondu les deux et a assumé que la fiabilité historique garantissait la sécurité dans les cas limites.
+        </div>
+      </details>
+    </div>
+
+    <div class="exam-q">
+      <div class="q-num">Question 03 — Vérification vs Validation</div>
+      <div class="q-text">Distinguez la vérification de la validation. Donnez un exemple concret pour chacune dans le contexte d'une application web de réservation de billets de concert.</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>Vérification (Building the system right) :</strong> On s'assure que le produit correspond aux spécifications.<br>
+          Exemple : « Les spécifications indiquent que le paiement doit être traité en moins de 3 secondes. Le test de performance confirme-t-il ce délai ? » → On vérifie la conformité aux specs.<br><br>
+          <strong>Validation (Building the right system) :</strong> On s'assure que le produit répond aux vrais besoins du client/utilisateur.<br>
+          Exemple : « Quand on fait tester l'application par de vrais utilisateurs, arrivent-ils à acheter un billet sans confusion ? Comprennent-ils le processus de paiement ? » → On valide l'utilité réelle.<br><br>
+          <strong>Note importante :</strong> Les deux sont nécessaires. Une app peut passer tous ses tests (vérification OK) mais être si compliquée à utiliser qu'aucun client n'arrive à compléter un achat (validation = échec).
+        </div>
+      </details>
+    </div>
+
+    <div class="exam-q">
+      <div class="q-num">Question 04 — Les 5 dimensions</div>
+      <div class="q-text">Votre équipe de 3 personnes doit livrer un MVP (Minimum Viable Product) dans 6 semaines pour une démo investisseurs. Le budget est fixe. Identifiez le rôle (objectif, contrainte, degré de liberté) de chaque dimension et justifiez.</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>Échéance :</strong> Objectif (driver) — La démo investisseurs est une date fixe, absolument non négociable. Aucune flexibilité.<br><br>
+          <strong>Personnel :</strong> Contrainte — 3 personnes est fixé. Très peu de marge (peut-être un stagiaire ?).<br><br>
+          <strong>Coût :</strong> Contrainte — Budget fixe par la direction. Peu de flexibilité.<br><br>
+          <strong>Fonctionnalités :</strong> Degré de liberté — Pour un MVP, on priorise les fonctionnalités essentielles pour la démo. Grande liberté de choisir ce qu'on coupe.<br><br>
+          <strong>Qualité :</strong> Degré de liberté — Pour une démo MVP, on peut accepter des bugs mineurs non-critiques. On vise une démo stable, pas un produit de production parfait. Flexibilité modérée.
+        </div>
+      </details>
+    </div>
+
+    <div class="exam-q">
+      <div class="q-num">Question 05 — Culture qualité</div>
+      <div class="q-text">Selon Wiegers, quels sont les 3 niveaux d'engagement nécessaires pour une culture qualité saine ? Donnez un exemple de comportement concret pour chaque niveau.</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>1. Niveau personnel (Chef de projet) :</strong> Engagement à appliquer systématiquement les bonnes pratiques.<br>
+          Exemple : Le chef de projet insiste pour qu'une revue de code soit faite avant chaque merge, même sous pression de livraison.<br><br>
+          <strong>2. Niveau organisationnel (Gestionnaires) :</strong> Fournir un environnement où la qualité est valorisée.<br>
+          Exemple : Les gestionnaires allouent du temps dans le sprint pour les activités d'AQ et ne pénalisent pas les développeurs qui signalent des problèmes de qualité.<br><br>
+          <strong>3. Niveau équipe (Tous les membres) :</strong> Amélioration continue des processus et des produits.<br>
+          Exemple : L'équipe organise des rétrospectives régulières pour identifier ce qui peut être amélioré dans leurs pratiques de développement.
+        </div>
+      </details>
+    </div>
+
+    <div class="exam-q">
+      <div class="q-num">Question 06 — Causes d'échecs</div>
+      <div class="q-text">Quelles sont les causes communes entre le cas Thérac-25 et le Boeing 737 Max ? Quelle leçon générale peut-on en tirer pour la gestion de projets logiciels ?</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>Causes communes :</strong><br>
+          • Tests inadéquats dans les deux cas<br>
+          • Documentation insuffisante (codes d'erreur incompréhensibles / MCAS non documenté dans le manuel de vol)<br>
+          • Signaux d'alarme ignorés (plaintes opérateurs Thérac / ingénieurs Boeing)<br>
+          • Absence d'évaluation indépendante du code<br>
+          • Pression organisationnelle ayant primé sur la sécurité<br><br>
+          <strong>Leçon générale :</strong> Dans les systèmes critiques, la culture organisationnelle est aussi importante que la technique. Quand la hiérarchie ignore les avertissements des experts, quand les tests sont négligés par pression commerciale, et quand la documentation est insuffisante, les accidents deviennent inévitables. L'AQ n'est pas qu'un processus technique — c'est une responsabilité éthique et légale.
+        </div>
+      </details>
+    </div>
+
+    <div class="exam-q" style="border-bottom:none">
+      <div class="q-num">Question 07 — Coûts de qualité</div>
+      <div class="q-text">Expliquez les quatre catégories de coûts d'un projet logiciel. Pourquoi dit-on qu'il existe un niveau optimal de qualité plutôt qu'une qualité maximale ?</div>
+      <details>
+        <summary>▶ Voir les éléments de réponse</summary>
+        <div class="answer">
+          <strong>Les 4 catégories :</strong><br>
+          1. <strong>Coût de réalisation :</strong> Développement normal — plans, code.<br>
+          2. <strong>Coût de prévention :</strong> Formation, méthodologies, outils — pour éviter les erreurs.<br>
+          3. <strong>Coût de détection :</strong> Tests, revues, inspections, audits — pour trouver les erreurs.<br>
+          4. <strong>Coût de défaillance :</strong> Interne (corrections avant livraison) + Externe (support, correctifs post-livraison) + Commercial (image, clients perdus).<br><br>
+          <strong>Pourquoi un niveau optimal et non maximal ?</strong><br>
+          Il existe un point de diminution marginale de retour. Au-delà d'un certain niveau de qualité, les coûts de prévention et de détection supplémentaires dépassent les économies réalisées sur les défaillances. Le graphique en U du cours illustre ce point : le coût total minimum est atteint à un niveau intermédiaire, pas au niveau de qualité parfaite (qui serait infiniment coûteux).
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  // Active sidebar link on scroll
+  const sections = document.querySelectorAll('.section[id], .exam-section[id]');
+  const links = document.querySelectorAll('#sidebar nav a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`#sidebar nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

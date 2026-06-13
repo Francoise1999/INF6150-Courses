@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assurance qualité logicielle — Séance 1 (Guide détaillé)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15212b;
+    --ink-soft:#3c4a55;
+    --paper:#eef2f3;
+    --paper-2:#e3eaec;
+    --card:#fbfcfc;
+    --line:#c4d1d4;
+    --accent:#0d6e6e;       /* deep teal */
+    --accent-2:#1e3a5f;     /* navy */
+    --amber:#b87514;        /* quality seal amber */
+    --danger:#a83232;       /* for errors/faults */
+    --highlight:#cdeae6;
+    --shadow:rgba(15,40,45,.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% -5%, #f3f7f7 0%, transparent 42%),
+      radial-gradient(circle at 96% 2%, #e1ebe9 0%, transparent 38%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Spectral',Georgia,serif;
+    font-size:18px;line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.03;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 24px 120px;}
+
+  header.hero{text-align:center;padding:80px 0 50px;border-bottom:3px double var(--line);margin-bottom:20px;}
+  .kicker{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.28em;font-size:.72rem;color:var(--accent);margin-bottom:22px;}
+  header.hero h1{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.4rem,6.5vw,4.2rem);line-height:1.02;margin:0 0 10px;letter-spacing:-.005em;color:var(--ink);}
+  header.hero h1 .em{color:var(--accent);font-style:italic;}
+  .sub{font-style:italic;color:var(--ink-soft);font-size:1.05rem;max-width:580px;margin:18px auto 0;}
+  .meta{margin-top:26px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ink-soft);letter-spacing:.05em;}
+
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:26px 30px;margin:38px 0 60px;box-shadow:0 14px 40px -28px var(--shadow);}
+  nav.toc h2{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin:0 0 16px;font-weight:600;}
+  nav.toc ol{margin:0;padding:0;list-style:none;counter-reset:toc;column-count:2;column-gap:38px;}
+  nav.toc li{counter-increment:toc;margin:0 0 9px;break-inside:avoid;}
+  nav.toc a{color:var(--ink-soft);text-decoration:none;font-size:.96rem;display:flex;gap:10px;align-items:baseline;transition:.2s;}
+  nav.toc a::before{content:counter(toc,decimal-leading-zero);font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);flex-shrink:0;}
+  nav.toc a:hover{color:var(--accent);}
+
+  section{margin:0 0 72px;scroll-margin-top:20px;}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:8px;border-bottom:2px solid var(--ink);padding-bottom:10px;}
+  .sec-num{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent);font-weight:600;flex-shrink:0;padding-top:6px;}
+  h2.sec-title{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(1.7rem,3.8vw,2.4rem);line-height:1.08;margin:0;}
+  h3{font-family:'DM Serif Display',serif;font-weight:400;font-size:1.42rem;margin:42px 0 4px;color:var(--accent-2);}
+  h4{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:28px 0 6px;font-weight:600;}
+  p{margin:14px 0;}
+  strong{color:var(--ink);font-weight:600;}
+  .term{background:linear-gradient(transparent 58%, var(--highlight) 58%);font-weight:600;padding:0 1px;}
+  em.fr{font-style:italic;color:var(--accent-2);}
+  ul,ol{margin:14px 0;padding-left:26px;}
+  li{margin:7px 0;}
+  ul.clean{list-style:none;padding-left:0;}
+  ul.clean li{padding-left:26px;position:relative;}
+  ul.clean li::before{content:"▸";position:absolute;left:2px;color:var(--accent);font-size:.9em;}
+
+  .box{border-radius:5px;padding:20px 24px;margin:24px 0;position:relative;}
+  .box .label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:8px;}
+  .def{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent-2);}
+  .def .label{color:var(--accent-2);}
+  .analogy{background:#eaf3f1;border:1px dashed var(--amber);}
+  .analogy .label{color:var(--amber);}
+  .analogy::after{content:"🔑";position:absolute;top:14px;right:18px;font-size:1.1rem;opacity:.5;}
+  .retain{background:#e7f1f0;border:1px solid #a9d2cc;border-left:4px solid var(--accent);}
+  .retain .label{color:var(--accent);}
+  .question{background:#eef1f6;border:1px solid #bcc8db;border-left:4px solid var(--accent-2);font-style:italic;}
+  .question .label{color:var(--accent-2);}
+  .warn{background:#f7ecec;border:1px solid #e0b4b4;border-left:4px solid var(--danger);}
+  .warn .label{color:var(--danger);}
+
+  /* error chain */
+  .chain{display:flex;align-items:stretch;gap:0;margin:26px 0;flex-wrap:wrap;justify-content:center;}
+  .chain .step{background:var(--card);border:1.5px solid var(--ink);border-radius:5px;padding:14px 18px;text-align:center;flex:1;min-width:150px;box-shadow:0 6px 16px -12px var(--shadow);}
+  .chain .step b{display:block;font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--danger);margin-bottom:3px;}
+  .chain .step small{font-size:.8rem;color:var(--ink-soft);font-style:italic;line-height:1.4;display:block;}
+  .chain .lk{display:flex;align-items:center;color:var(--accent);font-size:1.5rem;padding:0 8px;}
+
+  table.cmp{width:100%;border-collapse:collapse;margin:24px 0;font-size:.92rem;background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;}
+  .cmp th,.cmp td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);}
+  .cmp thead th{background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;}
+  .cmp tbody th{font-family:'DM Serif Display',serif;font-weight:400;color:var(--accent);width:26%;}
+  .cmp tr:last-child td,.cmp tr:last-child th{border-bottom:none;}
+
+  /* cost bars */
+  .bars{margin:24px 0;background:var(--card);border:1px solid var(--line);border-radius:5px;padding:22px 24px;}
+  .bars .row{display:grid;grid-template-columns:135px 1fr 80px;align-items:center;gap:12px;margin:9px 0;}
+  .bars .row .ph{font-size:.85rem;font-weight:600;}
+  .bars .row .track{background:var(--paper-2);border-radius:3px;height:20px;overflow:hidden;}
+  .bars .row .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--danger));border-radius:3px;}
+  .bars .row .val{font-family:'JetBrains Mono',monospace;font-size:.8rem;text-align:right;color:var(--danger);font-weight:600;}
+  .bars .cap{font-size:.82rem;color:var(--ink-soft);font-style:italic;margin-top:12px;}
+
+  .pill{display:inline-block;background:var(--paper-2);border:1px solid var(--line);border-radius:20px;padding:2px 12px;font-size:.82rem;font-family:'JetBrains Mono',monospace;margin:3px 4px 3px 0;}
+
+  .exam details{background:var(--card);border:1px solid var(--line);border-radius:5px;margin:14px 0;overflow:hidden;}
+  .exam summary{cursor:pointer;padding:16px 22px;font-weight:600;list-style:none;display:flex;gap:12px;align-items:flex-start;transition:.2s;}
+  .exam summary::-webkit-details-marker{display:none;}
+  .exam summary::before{content:"Q";font-family:'JetBrains Mono',monospace;background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;flex-shrink:0;margin-top:2px;}
+  .exam summary:hover{background:#eef5f4;}
+  .exam details[open] summary{border-bottom:1px solid var(--line);background:#eef5f4;}
+  .exam .answer{padding:6px 22px 20px 58px;color:var(--ink-soft);}
+  .exam .answer strong{color:var(--accent-2);}
+
+  hr.soft{border:none;border-top:1px solid var(--line);margin:34px 0;}
+  footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--ink-soft);letter-spacing:.1em;padding-top:30px;border-top:3px double var(--line);}
+  footer .accent{color:var(--accent);}
+
+  @media(max-width:620px){
+    body{font-size:16.5px;}
+    nav.toc ol{column-count:1;}
+    .sec-head{flex-direction:column;gap:4px;}
+    .bars .row{grid-template-columns:95px 1fr 70px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">UQAM · Génie logiciel · Séance 01</div>
+    <h1>Assurance<br><span class="em">qualité</span> logicielle</h1>
+    <p class="sub">Guide d'étude complet — qualité, erreurs/fautes/défaillances, élicitation des exigences, et différence AQ vs contrôle qualité, avec analogies et préparation à l'examen.</p>
+    <div class="meta">Introduction à l'AQL · d'après les notes de A. April, S. Trudel &amp; B. Gérançon</div>
+  </header>
+
+  <nav class="toc">
+    <h2>Plan de la séance</h2>
+    <ol>
+      <li><a href="#aql">Le triangle Dév · Tests · AQ</a></li>
+      <li><a href="#swebok">La qualité selon le SWEBoK</a></li>
+      <li><a href="#logiciel">Qu'est-ce qu'un logiciel&nbsp;?</a></li>
+      <li><a href="#efd">Erreur, faute, défaillance</a></li>
+      <li><a href="#bogue">Le mot «&nbsp;bogue&nbsp;» &amp; le cas BeauPrix</a></li>
+      <li><a href="#sources">Les sources des erreurs</a></li>
+      <li><a href="#cat8">Les 8 catégories de causes</a></li>
+      <li><a href="#exigences">Exigences &amp; MoSCoW</a></li>
+      <li><a href="#couts">Le coût de correction</a></li>
+      <li><a href="#qualite">Définir la qualité du logiciel</a></li>
+      <li><a href="#aq">L'assurance qualité (AQ)</a></li>
+      <li><a href="#cq">AQ vs contrôle qualité (CQ)</a></li>
+      <li><a href="#exam">Questions d'examen</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 1. TRIANGLE ============ -->
+  <section id="aql">
+    <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">Le triangle&nbsp;: Développement, Tests, Assurance Qualité</h2></div>
+
+    <p>Le cours commence par un petit schéma à trois cercles qui montre <strong>comment les trois activités collaborent</strong>. Il faut comprendre le rôle de chaque flèche.</p>
+
+    <ul class="clean">
+      <li>Le <strong>Développement</strong> <em>alimente</em> les <strong>Tests</strong> — c.-à-d. il produit le logiciel que les tests vont vérifier.</li>
+      <li>Les <strong>Tests</strong> <em>rapportent</em> à l'<strong>Assurance Qualité</strong> — ils remontent les défauts trouvés et les mesures de qualité.</li>
+      <li>L'<strong>Assurance Qualité</strong> <em>améliore</em> le <strong>Développement</strong> — à partir de ce qu'on a appris, elle fait évoluer la façon de travailler pour éviter de refaire les mêmes erreurs.</li>
+    </ul>
+
+    <div class="retain">
+      <span class="label">À retenir — c'est une boucle</span>
+      Développement → <em>alimente</em> → Tests → <em>rapporte</em> → AQ → <em>améliore</em> → Développement… et ça recommence. <strong>L'AQ ne fait pas que constater les bugs&nbsp;: elle agit sur le processus pour que la prochaine fois soit meilleure.</strong> C'est l'idée d'<strong>amélioration continue</strong>, centrale dans tout le cours.
+    </div>
+  </section>
+
+  <!-- ============ 2. SWEBOK ============ -->
+  <section id="swebok">
+    <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Comment définir la qualité du logiciel&nbsp;? (le SWEBoK)</h2></div>
+
+    <p>Le <strong>SWEBoK</strong> (<em class="fr">Software Engineering Body of Knowledge</em>) découpe le grand domaine «&nbsp;<strong>Assurance Qualité Logicielle</strong>&nbsp;» en <strong>quatre branches</strong>. Tu n'as pas à mémoriser chaque feuille, mais retiens les 4 branches et ce qu'elles contiennent.</p>
+
+    <table class="cmp">
+      <thead><tr><th>Branche</th><th>Ce qu'elle regroupe</th></tr></thead>
+      <tbody>
+        <tr><th>Aspects fondamentaux</th><td>Culture qualité &amp; éthique · valeur et coût de la qualité · modèle et caractéristiques qualité · amélioration de la qualité · sûreté du logiciel.</td></tr>
+        <tr><th>Processus de gestion de la qualité</th><td>Assurance qualité logicielle · Vérification &amp; Validation (V&amp;V) · revues et audits.</td></tr>
+        <tr><th>Considérations pratiques</th><td>Exigences qualité · classification des défauts · gestion de la qualité du logiciel · mesures qualité du logiciel.</td></tr>
+        <tr><th>Outils de gestion de la qualité</th><td>Les outils logiciels qui aident à gérer la qualité (suivi des défauts, mesures, etc.).</td></tr>
+      </tbody>
+    </table>
+
+    <div class="retain">
+      <span class="label">À retenir — Vérification vs Validation (V&amp;V)</span>
+      Deux mots qui se ressemblent mais sont différents (question piège classique)&nbsp;:<br>
+      <strong>Vérification</strong> = «&nbsp;Avons-nous bien <em>construit le produit</em>&nbsp;?&nbsp;» (conforme aux spécifications&nbsp;?).<br>
+      <strong>Validation</strong> = «&nbsp;Avons-nous construit <em>le bon produit</em>&nbsp;?&nbsp;» (répond-il au vrai besoin du client&nbsp;?).
+    </div>
+  </section>
+
+  <!-- ============ 3. LOGICIEL ============ -->
+  <section id="logiciel">
+    <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Qu'est-ce qu'un logiciel&nbsp;?</h2></div>
+
+    <div class="def">
+      <span class="label">Définition — Logiciel (ISO 24765)</span>
+      Un <strong>ensemble de programmes, de procédures et de documentation associée, et les données</strong> qui concernent le fonctionnement d'un système informatique.
+    </div>
+
+    <p>Point <strong>très important</strong> de cette définition&nbsp;: un logiciel <strong>n'est pas juste du code</strong>&nbsp;! Le cours détaille <strong>cinq composantes</strong>&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Programmes</strong> — le code source, qui a fait l'objet de spécification, conception, inspection et essais (unitaires, système, acceptation avec le client).</li>
+      <li><strong>Données</strong> — inventoriées, modélisées, normalisées, et créées pour faire des scénarios d'essais.</li>
+      <li><strong>Processus</strong> — les processus d'affaires des utilisateurs, décrits (avant et après automatisation), étudiés et optimisés.</li>
+      <li><strong>Règles</strong> — les règles d'affaires, décrites, validées, implantées et testées.</li>
+      <li><strong>Documentation</strong> — utile aux utilisateurs, développeurs et mainteneurs&nbsp;; elle permet de mieux <em>communiquer, réviser et tester</em>. Elle est produite à <strong>toutes les étapes clés</strong> du cycle de vie.</li>
+    </ul>
+
+    <h3>Le micro-logiciel (firmware)</h3>
+    <p>Le terme «&nbsp;logiciel&nbsp;» inclut aussi le <strong>firmware</strong> (IEEE 730), la documentation, les données et les instructions de contrôle d'exécution.</p>
+    <div class="def">
+      <span class="label">Définition — Firmware / Micro-logiciel (ISO 24765)</span>
+      Une <strong>combinaison d'un dispositif matériel et d'instructions (ou de données)</strong> qui résident en <strong>mode lecture seulement</strong> sur un périphérique matériel.
+    </div>
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      Le <strong>firmware</strong>, c'est le logiciel «&nbsp;gravé&nbsp;» dans un appareil&nbsp;: celui de ta <em>souris</em>, de ta <em>imprimante</em> ou du <em>BIOS</em> de ton PC. Tu ne le modifies pas comme une appli ordinaire&nbsp;— il est à mi-chemin entre le matériel et le logiciel.
+    </div>
+
+    <div class="retain">
+      <span class="label">À retenir</span>
+      Quand l'AQL parle de «&nbsp;qualité du logiciel&nbsp;», elle vise <strong>les 5 composantes</strong>, pas seulement le code. Un logiciel avec du code parfait mais une <em>documentation absente</em> ou des <em>données mal modélisées</em> est un logiciel de mauvaise qualité.
+    </div>
+  </section>
+
+  <!-- ============ 4. ERREUR FAUTE DEFAILLANCE ============ -->
+  <section id="efd">
+    <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">Erreur, faute, défaillance&nbsp;: les trois mots à NE PAS confondre</h2></div>
+
+    <p>C'est <strong>la</strong> distinction la plus testée du chapitre. Dans la vraie vie, on dit «&nbsp;j'ai trouvé un bug&nbsp;», «&nbsp;le système a planté&nbsp;», «&nbsp;il y a un problème&nbsp;»… mais le génie logiciel exige des mots <strong>précis</strong>.</p>
+
+    <div class="def">
+      <span class="label">Erreur (error) — ISO 24765</span>
+      Une <strong>action humaine</strong> qui produit un résultat incorrect. L'erreur se <em>cache</em> dans les documents et le logiciel.<br><em>C'est la cause humaine&nbsp;:</em> le développeur s'est trompé (mauvaise compréhension, étourderie…).
+    </div>
+    <div class="def">
+      <span class="label">Faute / Défaut (defect, fault) — ISO 24765</span>
+      Le logiciel <strong>programmé avec cette erreur</strong> contient une faute&nbsp;; si elle n'est pas corrigée, elle <em>pourra</em> causer une défaillance ou produire des résultats incorrects.<br><em>C'est la trace de l'erreur dans le produit&nbsp;:</em> le morceau de code/document fautif.
+    </div>
+    <div class="def">
+      <span class="label">Défaillance (failure) — ISO 24765 / 25000</span>
+      La <strong>manifestation</strong> d'un défaut&nbsp;: la cessation de l'aptitude du produit à accomplir une fonction requise (ou son incapacité à le faire dans les limites spécifiées).<br><em>C'est le symptôme visible&nbsp;:</em> le système plante, donne un mauvais résultat, etc.
+    </div>
+
+    <h4>La chaîne de causalité</h4>
+    <div class="chain">
+      <div class="step"><b>Erreur</b><small>action humaine (le dév se trompe)</small></div>
+      <div class="lk">→</div>
+      <div class="step"><b>Faute</b><small>l'erreur s'inscrit dans le code/doc</small></div>
+      <div class="lk">→</div>
+      <div class="step"><b>Défaillance</b><small>le défaut se manifeste à l'usage</small></div>
+    </div>
+    <p style="text-align:center;font-style:italic;color:var(--ink-soft);font-size:.9rem;">Pendant la conception → l'erreur. Avant/pendant les essais → la faute (à détecter&nbsp;!). En production → la défaillance (qu'on voulait éviter&nbsp;!).</p>
+
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      <strong>Une recette de cuisine.</strong> L'<em>erreur</em> = le cuisinier lit «&nbsp;2&nbsp;c. à thé de sel&nbsp;» mais comprend «&nbsp;2&nbsp;c. à soupe&nbsp;». La <em>faute</em> = c'est désormais écrit comme ça dans <em>sa version</em> de la recette. La <em>défaillance</em> = le jour où quelqu'un cuisine le plat et le trouve immangeable. Tant que personne ne cuisine la recette, la faute existe… sans jamais devenir une défaillance.
+    </div>
+
+    <div class="retain">
+      <span class="label">À retenir — le grand principe de l'AQL</span>
+      C'est <strong>normal de faire des erreurs</strong> en logiciel. L'objectif de l'AQL est de <strong>détecter et corriger les fautes AVANT qu'elles ne deviennent des défaillances visibles par le client</strong>, et de remonter aux <em>causes</em> pour corriger durablement.
+    </div>
+  </section>
+
+  <!-- ============ 5. BOGUE + BEAUPRIX ============ -->
+  <section id="bogue">
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">Le mot «&nbsp;bogue&nbsp;» &amp; le cas BeauPrix</h2></div>
+
+    <h3>Pourquoi éviter le mot «&nbsp;bogue&nbsp;»&nbsp;?</h3>
+    <p>Le mot «&nbsp;bogue&nbsp;» (<em>bug</em>) est utilisé depuis l'époque d'Edison. Il est <strong>trop vague</strong>&nbsp;: il couvre une multitude de problèmes différents. En AQL, on préfère les mots précis (erreur / faute / défaillance) pour savoir <em>de quoi on parle exactement</em>.</p>
+    <p><strong>Anecdote célèbre</strong>&nbsp;: en <strong>1947</strong>, un vrai papillon de nuit (une <em>mite</em>) est coincé dans un relais de l'ordinateur <strong>Mark II de Harvard</strong>. L'opératrice <strong>Grace Hopper</strong> colle l'insecte dans le journal de bord sous le titre <em class="fr">«&nbsp;First actual case of a bug being found&nbsp;»</em>. C'est le premier «&nbsp;bug informatique&nbsp;» documenté&nbsp;— au sens littéral&nbsp;!</p>
+
+    <h3>Le cas «&nbsp;Pharmacie BeauPrix&nbsp;» (à comprendre en profondeur)</h3>
+    <div class="def">
+      <span class="label">L'énoncé</span>
+      La pharmacie BeauPrix ajoute une exigence&nbsp;: empêcher une vente de plus de <strong>75&nbsp;$</strong> aux clients ayant une dette de plus de 200&nbsp;$ sur leur carte de crédit. Le programmeur <strong>comprend mal</strong> la spécification et code un critère défectueux de <strong>500&nbsp;$</strong>. Or la carte a une limite de <strong>400&nbsp;$</strong>&nbsp;: aucun client ne peut donc acheter pour plus de 500&nbsp;$. La faute ne s'est <strong>jamais</strong> traduite en défaillance.
+    </div>
+    <p>Décodons le cas avec notre vocabulaire&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Erreur</strong> — le programmeur a <em>mal compris</em> la spécification (75&nbsp;$ devient 500&nbsp;$). C'est l'action humaine fautive.</li>
+      <li><strong>Faute</strong> — le critère «&nbsp;500&nbsp;$&nbsp;» <em>est désormais dans le code</em>. Le défaut existe bel et bien.</li>
+      <li><strong>Défaillance</strong> — <strong>elle n'a jamais eu lieu</strong>, car la limite de carte (400&nbsp;$) empêche d'atteindre le seuil bogué de 500&nbsp;$. Le défaut est resté «&nbsp;dormant&nbsp;».</li>
+    </ul>
+    <div class="warn">
+      <span class="label">Leçon du cas</span>
+      <strong>Une faute ne devient pas forcément une défaillance.</strong> Mais c'est dangereux de s'y fier&nbsp;: si la pharmacie augmentait un jour la limite de carte à 600&nbsp;$, la faute «&nbsp;dormante&nbsp;» se réveillerait et causerait enfin une défaillance. C'est pourquoi on corrige les fautes <em>même si</em> elles ne se manifestent pas encore.
+    </div>
+  </section>
+
+  <!-- ============ 6. SOURCES ============ -->
+  <section id="sources">
+    <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">D'où viennent les erreurs&nbsp;? (les statistiques)</h2></div>
+
+    <p>Le cours présente plusieurs études pour montrer que <strong>les erreurs s'introduisent surtout TÔT</strong> dans le cycle de vie (exigences, conception), pas seulement au codage. Voici les chiffres clés.</p>
+
+    <h4>Étude de Beizer (1990) — répartition par origine</h4>
+    <p><span class="pill">Structurelles 25%</span><span class="pill">Données 22%</span><span class="pill">Fonctionnalités 16%</span><span class="pill">Codage 10%</span><span class="pill">Intégration 9%</span><span class="pill">Exigences 8%</span><span class="pill">Tests 3%</span><span class="pill">Architecture 2%</span><span class="pill">Non spécifiées 5%</span></p>
+
+    <h4>Étude de Humphrey (2008) — densité de défauts</h4>
+    <p>Sur <strong>810 ingénieurs expérimentés</strong>, Humphrey observe&nbsp;:</p>
+    <ul class="clean">
+      <li>Les développeurs injectent typiquement <strong>~100 défauts par 1000 lignes de code</strong> (soit <strong>1 défaut toutes les 10 lignes</strong>&nbsp;!).</li>
+      <li>Énorme variation entre individus&nbsp;: de <strong>40 à 250 défauts</strong> / 1000 lignes.</li>
+      <li>Certains arrivent au début des tests avec ~50 défauts/1000 lignes, d'autres avec seulement 10 à 20.</li>
+    </ul>
+
+    <div class="retain">
+      <span class="label">À retenir — le message des chiffres</span>
+      Faire des défauts est <strong>massif et normal</strong> (1 par 10 lignes&nbsp;!). Une grande part vient des <strong>phases amont</strong> (structure, données, spécifications). Donc&nbsp;: <strong>plus on détecte tôt, mieux c'est</strong> — ce qui nous mène directement au coût de correction (section 09).
+    </div>
+
+    <h3>Les 8 catégories de provenance (le plan du chapitre)</h3>
+    <p>Le cours propose <strong>8 grandes catégories de causes</strong>, qui structurent toute la suite&nbsp;:</p>
+    <ol>
+      <li>Difficulté de <strong>définition des exigences</strong>.</li>
+      <li>Difficulté de maintenir une <strong>communication efficace</strong> client ↔ développeur.</li>
+      <li><strong>Déviations</strong> aux spécifications.</li>
+      <li>Erreurs d'<strong>architecture et de conception</strong>.</li>
+      <li>Erreurs de <strong>codage</strong>.</li>
+      <li><strong>Non-conformité</strong> aux processus/procédures en place.</li>
+      <li><strong>Revues et tests inadéquats</strong>.</li>
+      <li>Erreurs de <strong>documentation</strong>.</li>
+    </ol>
+  </section>
+
+  <!-- ============ 7. LES 8 CATEGORIES ============ -->
+  <section id="cat8">
+    <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title">Les 8 catégories de causes, en détail</h2></div>
+
+    <h3>1 — La difficulté de définition des exigences</h3>
+    <p>C'est le rôle de l'<strong>analyste d'affaires</strong> (<em class="fr">business analyst</em>) de documenter besoins et exigences. Il doit maîtriser&nbsp;:</p>
+    <ul class="clean">
+      <li>Identifier les <strong>intervenants (parties prenantes)</strong> à faire participer.</li>
+      <li>La <strong>gestion des réunions</strong> et les <strong>techniques d'interview</strong> pour trier entre <em>souhaits, attentes et besoins réels</em>.</li>
+      <li>La <strong>rédaction claire</strong> des exigences (fonctionnelles, obligations, propriétés).</li>
+      <li>L'application d'une technique d'<strong>élicitation</strong> et la <strong>gestion des changements</strong> aux exigences.</li>
+    </ul>
+    <div class="def">
+      <span class="label">Mot-clé — Élicitation (ou élucidation)</span>
+      = <strong>Obtention et explicitation</strong> des exigences. On <em>fait émerger</em> les besoins (qui sont souvent flous ou implicites) en discutant avec les utilisateurs&nbsp;; ils ne sont jamais donnés tout cuits.
+    </div>
+    <h4>Les trois types d'exigences</h4>
+    <ul class="clean">
+      <li><strong>Fonctionnelles</strong> — «&nbsp;ce qui doit être exécuté&nbsp;» (les actions du système).</li>
+      <li><strong>Contraintes</strong> — «&nbsp;les obligations&nbsp;» (ce qu'on est forcé de respecter).</li>
+      <li><strong>Non fonctionnelles</strong> — «&nbsp;les propriétés du système&nbsp;» (performance, sécurité, ergonomie…&nbsp;: le <em>comment</em>, pas le <em>quoi</em>).</li>
+    </ul>
+    <h4>Techniques d'élicitation</h4>
+    <p>Lecture de documents externes · s'immerger dans le milieu · interviews · comparer à d'autres systèmes · <em>brainstorming</em>.</p>
+    <h4>Le processus de définition d'exigences</h4>
+    <div class="chain">
+      <div class="step"><b style="color:var(--accent)">Élicitation</b><small>obtenir</small></div>
+      <div class="lk">→</div>
+      <div class="step"><b style="color:var(--accent)">Analyse</b><small>clarifier</small></div>
+      <div class="lk">→</div>
+      <div class="step"><b style="color:var(--accent)">Spécification</b><small>réécrire</small></div>
+      <div class="lk">→</div>
+      <div class="step"><b style="color:var(--accent)">Validation</b><small>ré-évaluer / compléter</small></div>
+    </div>
+
+    <h3>2 — Maintenir une communication efficace</h3>
+    <p>Beaucoup d'erreurs viennent de <strong>mésententes involontaires</strong> entre l'équipe TI et les clients&nbsp;: mauvaise interprétation des instructions, client qui veut tout tout de suite, client qui ne lit pas la doc, changements mal compris… <strong>Dans certains projets, 25&nbsp;% des spécifications changent avant la fin.</strong></p>
+    <p>Pour minimiser ces erreurs&nbsp;:</p>
+    <ul class="clean">
+      <li>Prendre des <strong>notes</strong> à chaque réunion et diffuser le compte rendu à toute l'équipe.</li>
+      <li>Tenir un <strong>glossaire des termes</strong> partagé (cohérence du vocabulaire).</li>
+      <li>Informer les utilisateurs du <strong>coût des modifications</strong>.</li>
+      <li>Choisir un <strong>cycle de vie</strong> qui accepte les modifications en cours de route.</li>
+      <li><strong>Numéroter chaque exigence</strong> et instaurer la <strong>gestion du changement</strong>.</li>
+    </ul>
+
+    <h3>3 — Les déviations aux spécifications</h3>
+    <p>Quand le développeur <strong>interprète mal</strong> une spécification et code selon <em>sa</em> compréhension. Les défauts ne sont alors trouvés que <strong>tard</strong> (ou en production). Autres déviations&nbsp;:</p>
+    <ul class="clean">
+      <li>Réutiliser du <strong>code existant</strong> sans l'ajuster aux nouvelles exigences.</li>
+      <li>Sous pression de temps/budget, <strong>laisser tomber</strong> une partie des exigences.</li>
+      <li>Des «&nbsp;<strong>améliorations</strong>&nbsp;» décidées par le développeur <em>sans consulter le client</em>.</li>
+    </ul>
+
+    <h3>4 — Les erreurs d'architecture et de conception</h3>
+    <ul class="clean">
+      <li>Mauvais <strong>algorithmes</strong> pour les exigences.</li>
+      <li>Mauvaise séquence de processus, mauvais critères de règles d'affaires.</li>
+      <li><strong>Oubli d'états</strong> d'une transaction (mal représenter le processus du client).</li>
+      <li>Oublier de traiter les <strong>erreurs et cas exceptionnels</strong> — et c'est énorme&nbsp;: <strong>on estime que jusqu'à 80&nbsp;% du code</strong> sert à traiter les cas exceptionnels et d'erreur&nbsp;!</li>
+    </ul>
+
+    <h3>5 — Les erreurs de codage</h3>
+    <ul class="clean">
+      <li>Mauvais choix de <strong>langage</strong> ou de conventions&nbsp;; ne pas gérer la <strong>complexité</strong> dès le départ.</li>
+      <li>Mauvaise interprétation des documents de conception&nbsp;; abstractions incohérentes.</li>
+      <li>Erreurs dans les <strong>boucles et conditions</strong>, dans le traitement ou la séquence des données.</li>
+      <li>Manque de <strong>validation des entrées</strong>.</li>
+    </ul>
+
+    <h3>6 — La non-conformité aux processus/procédures</h3>
+    <p>Beaucoup d'organisations ont leur <strong>méthodologie interne</strong> (processus, livrables, gabarits, normes). Un employé qui «&nbsp;ne fait que coder&nbsp;» semble <em>plus productif</em>… mais au <strong>détriment de la documentation</strong>. Un logiciel non documenté provoque tôt ou tard&nbsp;:</p>
+    <ul class="clean">
+      <li>Difficulté pour l'équipe à <strong>coordonner, comprendre et tester</strong> le code.</li>
+      <li>Le remplaçant n'a <strong>que le code source</strong> pour comprendre.</li>
+      <li>Beaucoup de <strong>non-conformités</strong> relevées par l'AQL.</li>
+      <li>Tests difficiles (spécifications absentes) et <strong>maintenance</strong> pénible.</li>
+    </ul>
+
+    <h3>7 — Les revues et tests inadéquats</h3>
+    <ul class="clean">
+      <li>Les revues ne couvrent qu'une <strong>petite portion</strong> des livrables et ne trouvent pas tout.</li>
+      <li>Les <strong>recommandations</strong> des revues ne sont pas suivies.</li>
+      <li>Plans de tests <strong>incomplets</strong> → couverture insuffisante.</li>
+      <li>Étape de tests <strong>raccourcie</strong> (coincée entre codage et livraison).</li>
+      <li>Les défauts corrigés ne sont pas <strong>re-testés</strong> — d'où l'importance des <strong>tests de régression</strong> (re-tester pour vérifier qu'une correction n'a rien cassé d'autre).</li>
+    </ul>
+
+    <h3>8 — Les erreurs de documentation</h3>
+    <p>La documentation <strong>obsolète ou déficiente</strong> des logiciels en opération est un problème <em>courant</em>&nbsp;: peu d'équipes aiment documenter. C'est pourtant ce qui permet à toute l'équipe de communiquer, réviser, tester et maintenir.</p>
+  </section>
+
+  <!-- ============ 8. EXIGENCES & MOSCOW ============ -->
+  <section id="exigences">
+    <div class="sec-head"><span class="sec-num">08</span><h2 class="sec-title">Qualité d'une exigence &amp; priorisation MoSCoW</h2></div>
+
+    <h3>Les caractéristiques d'une bonne exigence</h3>
+    <p>Une exigence est de <strong>bonne qualité</strong> si elle est (truc mnémo&nbsp;: beaucoup commencent par «&nbsp;c&nbsp;»)&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Correcte</strong> · <strong>Complète</strong> · <strong>Claire</strong> pour chaque lecteur (client, architecte, testeur).</li>
+      <li><strong>Concise</strong> (simple, précise) · <strong>Consistante</strong> (cohérente avec les autres).</li>
+      <li><strong>Réalisable</strong> (réaliste) · <strong>Nécessaire</strong> (répond à un vrai besoin).</li>
+      <li><strong>Indépendante de la conception</strong> et <strong>de la technique d'implantation</strong> (elle dit <em>quoi</em>, pas <em>comment</em>).</li>
+      <li><strong>Vérifiable et testable</strong> · <strong>Unique</strong>.</li>
+    </ul>
+
+    <h3>Prioriser avec MoSCoW</h3>
+    <p><strong>MoSCoW</strong> est une technique pour classer les exigences par priorité. Les majuscules forment l'acronyme&nbsp;:</p>
+    <table class="cmp">
+      <thead><tr><th>Lettre</th><th>Signification</th><th>Sens</th></tr></thead>
+      <tbody>
+        <tr><th>M — Must</th><td>«&nbsp;Must have this&nbsp;»</td><td>Exigence <strong>essentielle, vitale</strong> — doit être réalisée (les <em>besoins / obligations</em>).</td></tr>
+        <tr><th>S — Should</th><td>«&nbsp;Should have this if at all possible&nbsp;»</td><td>Exigence <strong>importante</strong> — si possible.</td></tr>
+        <tr><th>C — Could</th><td>«&nbsp;Could have this if it does not affect anything else&nbsp;»</td><td>Exigence de <strong>confort</strong> — si elle n'impacte rien d'autre.</td></tr>
+        <tr><th>W — Won't</th><td>«&nbsp;Won't have this time but would like in the future&nbsp;»</td><td>Un <strong>luxe</strong> — pas maintenant, peut-être plus tard.</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.9rem;color:var(--ink-soft);font-style:italic;">Les deux «&nbsp;o&nbsp;» minuscules (M<strong>o</strong>SC<strong>o</strong>W) ne servent qu'à rendre le mot prononçable.</p>
+
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      Tu fais ta valise pour un voyage avec un sac trop petit. <strong>Must</strong> = passeport, billets (sans ça, pas de voyage). <strong>Should</strong> = de quoi te couvrir s'il fait froid. <strong>Could</strong> = un bon livre si la place le permet. <strong>Won't</strong> = ton oreiller préféré — ce sera pour la prochaine fois.
+    </div>
+  </section>
+
+  <!-- ============ 9. COUTS ============ -->
+  <section id="couts">
+    <div class="sec-head"><span class="sec-num">09</span><h2 class="sec-title">Le coût de correction&nbsp;: le graphique le plus important</h2></div>
+
+    <p>Voici le concept que les profs <strong>adorent</strong> mettre à l'examen. Le coût pour corriger un même défaut <strong>explose</strong> selon le moment où on le trouve dans le cycle de vie (chiffres Jones 2000, en $ 2009).</p>
+
+    <div class="bars">
+      <div class="row"><span class="ph">Concept</span><div class="track"><div class="fill" style="width:1%"></div></div><span class="val">~0&nbsp;$</span></div>
+      <div class="row"><span class="ph">Exigences</span><div class="track"><div class="fill" style="width:1%"></div></div><span class="val">175&nbsp;$</span></div>
+      <div class="row"><span class="ph">Conception</span><div class="track"><div class="fill" style="width:3%"></div></div><span class="val">572&nbsp;$</span></div>
+      <div class="row"><span class="ph">Implémentation</span><div class="track"><div class="fill" style="width:7%"></div></div><span class="val">1&nbsp;227&nbsp;$</span></div>
+      <div class="row"><span class="ph">Test</span><div class="track"><div class="fill" style="width:51%"></div></div><span class="val">8&nbsp;963&nbsp;$</span></div>
+      <div class="row"><span class="ph">Opérations</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="val">17&nbsp;713&nbsp;$</span></div>
+      <div class="cap">Coût de correction d'un défaut selon la phase où il est trouvé (Jones 2000).</div>
+    </div>
+
+    <div class="retain">
+      <span class="label">À retenir — le principe (à savoir par cœur)</span>
+      <strong>Plus on trouve un défaut tard, plus il coûte cher à corriger</strong> — la progression est presque exponentielle. Corriger en phase d'<em>exigences</em> coûte ~175&nbsp;$&nbsp;; le même défaut trouvé en <em>opérations</em> coûte ~17&nbsp;713&nbsp;$, soit <strong>~100 fois plus</strong>. C'est <em>toute</em> la justification économique de l'AQL&nbsp;: investir tôt (revues, V&amp;V) pour éviter des corrections ruineuses plus tard.
+    </div>
+
+    <p>Une figure similaire (slide «&nbsp;coût de qualité&nbsp;») montre la même tendance&nbsp;: Requirements 139&nbsp;$ → Design 455&nbsp;$ → Coding 977&nbsp;$ → Testing 7&nbsp;136&nbsp;$ → Maintenance 14&nbsp;102&nbsp;$. Même message&nbsp;: <strong>le coût grimpe en flèche vers la fin du cycle de vie</strong>.</p>
+  </section>
+
+  <!-- ============ 10. DEFINIR QUALITE ============ -->
+  <section id="qualite">
+    <div class="sec-head"><span class="sec-num">10</span><h2 class="sec-title">Définir la qualité dans le domaine du logiciel</h2></div>
+
+    <div class="def">
+      <span class="label">Définition — Qualité (ISO 24765)</span>
+      Capacité d'un produit logiciel à <strong>satisfaire les besoins exprimés ET implicites</strong> (c.-à-d. les <em>attentes</em>) quand il est utilisé dans des <strong>conditions spécifiées</strong>.
+    </div>
+
+    <p>Deux nuances cruciales&nbsp;:</p>
+    <ul class="clean">
+      <li><strong>Besoins exprimés vs implicites</strong> — le client énonce certains besoins, mais en a d'autres qu'il ne dit pas (les <em>attentes</em>, qui ne sont «&nbsp;pas nécessairement décrites&nbsp;»). La qualité, c'est satisfaire <em>les deux</em>.</li>
+      <li><strong>«&nbsp;Plusieurs utilisateurs&nbsp;»</strong> — il n'y a pas qu'un seul «&nbsp;utilisateur&nbsp;». Le cours en distingue trois&nbsp;: celui qui <strong>utilise</strong> le logiciel, celui qui l'<strong>installe</strong>, et celui qui le <strong>maintient</strong>. La qualité doit les satisfaire tous.</li>
+    </ul>
+
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      Tu commandes un gâteau «&nbsp;au chocolat&nbsp;» (besoin exprimé). Tu <em>t'attends</em> aussi à ce qu'il ne soit pas brûlé et qu'il tienne debout (attentes implicites, jamais dites). Un gâteau au chocolat… brûlé reste un échec de qualité, même s'il respecte la commande à la lettre.
+    </div>
+  </section>
+
+  <!-- ============ 11. AQ ============ -->
+  <section id="aq">
+    <div class="sec-head"><span class="sec-num">11</span><h2 class="sec-title">L'assurance qualité logicielle (AQ)</h2></div>
+
+    <p>Le cours donne <strong>trois définitions</strong> de l'AQ&nbsp;; elles se rejoignent autour de deux idées&nbsp;: «&nbsp;activités <strong>planifiées et systématiques</strong>&nbsp;» et «&nbsp;fournir une <strong>assurance suffisante</strong>&nbsp;».</p>
+    <ol>
+      <li>Un ensemble d'activités <strong>planifiées et systématiques</strong> pour fournir une <strong>assurance suffisante</strong> qu'un élément produit est <strong>conforme aux exigences techniques</strong> établies.</li>
+      <li>Un ensemble d'activités pour <strong>évaluer le processus</strong> par lequel les produits sont développés ou fabriqués.</li>
+      <li>Les activités planifiées et systématiques du <strong>système qualité</strong>, démontrées au besoin, pour assurer qu'une entité satisfera aux exigences de qualité.</li>
+    </ol>
+
+    <div class="warn">
+      <span class="label">Attention au mot «&nbsp;assurance&nbsp;» (note du cours)</span>
+      «&nbsp;Assurer&nbsp;» signifie «&nbsp;<strong>donner la certitude</strong>&nbsp;». Mais comme «&nbsp;assurance-vie&nbsp;», le terme <strong>peut tromper</strong>&nbsp;: mettre en place des pratiques de génie logiciel <strong>ne peut PAS garantir</strong> la qualité d'un projet à 100&nbsp;%. L'AQ <em>réduit les risques</em> et <em>donne confiance</em>, elle ne «&nbsp;assure&nbsp;» pas un succès certain.
+    </div>
+
+    <h4>Pourquoi met-on l'AQ en place&nbsp;? (deux buts)</h4>
+    <ul class="clean">
+      <li><strong>But interne</strong> — dans l'organisation, l'AQ donne <strong>confiance à la direction</strong>.</li>
+      <li><strong>But externe</strong> — en situation contractuelle, l'AQ donne <strong>confiance au client</strong> (ou à des tiers).</li>
+    </ul>
+    <p>Concrètement, l'AQ implique de&nbsp;: <strong>planifier</strong> les aspects qualité, déployer des <strong>activités systématiques</strong> tout au long du cycle de vie, maintenir un <strong>système qualité</strong> (politique qualité + amélioration continue), exécuter des <strong>techniques d'AQ</strong> pour démontrer le niveau atteint, et <strong>démontrer la satisfaction</strong> des exigences qualité du projet.</p>
+  </section>
+
+  <!-- ============ 12. AQ vs CQ ============ -->
+  <section id="cq">
+    <div class="sec-head"><span class="sec-num">12</span><h2 class="sec-title">Assurance qualité (AQ) vs contrôle de la qualité (CQ)</h2></div>
+
+    <p>Encore une <strong>distinction d'examen quasi garantie</strong>. Le contrôle de la qualité, c'est&nbsp;:</p>
+    <div class="def">
+      <span class="label">Contrôle de la qualité (CQ)</span>
+      Un ensemble d'activités visant à <strong>évaluer la qualité des produits</strong> développés ou fabriqués&nbsp;; le processus de <strong>vérification</strong> de son propre travail ou de celui d'un collègue.<br><em>(Note du cours&nbsp;: ce terme n'a pas encore de signification normalisée en génie logiciel.)</em>
+    </div>
+
+    <table class="cmp">
+      <thead><tr><th></th><th>Contrôle de qualité (CQ)</th><th>Assurance qualité (AQ)</th></tr></thead>
+      <tbody>
+        <tr><th>Quand&nbsp;?</th><td>Sur le <strong>produit fini</strong>, contrôlé <em>avant sa livraison</em>.</td><td><strong>Tout au long</strong> du processus de développement.</td></tr>
+        <tr><th>Quoi&nbsp;?</th><td><strong>Détecter</strong> les défauts du produit.</td><td><strong>Prévenir</strong> les erreurs, puis les détecter et les corriger.</td></tr>
+        <tr><th>Vise…</th><td>Le <strong>produit</strong>.</td><td>Le <strong>processus</strong> (et le produit).</td></tr>
+      </tbody>
+    </table>
+
+    <div class="retain">
+      <span class="label">À retenir — la phrase exacte du cours</span>
+      <strong>«&nbsp;Le contrôle de qualité est UNE activité DE l'assurance qualité.&nbsp;»</strong> Autrement dit, le CQ est <em>inclus dans</em> l'AQ&nbsp;: l'AQ est le grand parapluie (prévention + processus + amélioration continue), et le CQ en est une partie (la vérification du produit).
+    </div>
+
+    <div class="analogy">
+      <span class="label">Analogie</span>
+      Dans un restaurant&nbsp;: le <strong>contrôle qualité</strong>, c'est le chef qui goûte le plat <em>avant</em> de l'envoyer en salle. L'<strong>assurance qualité</strong>, c'est tout le système qui fait qu'il y a <em>peu de chances</em> que le plat soit raté&nbsp;: recettes standardisées, formation des cuisiniers, fraîcheur des ingrédients, hygiène de la cuisine… La dégustation finale (CQ) n'est qu'<em>un</em> maillon de ce système (AQ).
+    </div>
+  </section>
+
+  <!-- ============ EXAM ============ -->
+  <section id="exam" class="exam">
+    <div class="sec-head"><span class="sec-num">13</span><h2 class="sec-title">Questions d'examen</h2></div>
+    <p>Clique sur une question pour révéler la réponse. Essaie d'abord d'y répondre de mémoire.</p>
+
+    <details>
+      <summary>Définissez erreur, faute et défaillance, et donnez la chaîne qui les relie.</summary>
+      <div class="answer"><strong>Erreur</strong> = action humaine produisant un résultat incorrect (la cause). <strong>Faute/défaut</strong> = l'erreur inscrite dans le code/document. <strong>Défaillance</strong> = la manifestation visible du défaut à l'usage. Chaîne&nbsp;: <strong>Erreur → Faute → Défaillance</strong> (conception → essais → production).</div>
+    </details>
+
+    <details>
+      <summary>Dans le cas BeauPrix, identifiez l'erreur, la faute et la défaillance. Pourquoi n'y a-t-il pas eu de défaillance&nbsp;?</summary>
+      <div class="answer"><strong>Erreur</strong>&nbsp;: le programmeur comprend mal la spec (75&nbsp;$ → 500&nbsp;$). <strong>Faute</strong>&nbsp;: le critère «&nbsp;500&nbsp;$&nbsp;» est dans le code. <strong>Défaillance</strong>&nbsp;: aucune, car la limite de carte (400&nbsp;$) empêche d'atteindre le seuil bogué de 500&nbsp;$. La faute reste «&nbsp;dormante&nbsp;» — mais resterait dangereuse si la limite augmentait.</div>
+    </details>
+
+    <details>
+      <summary>Quelles sont les cinq composantes d'un logiciel selon ISO 24765&nbsp;?</summary>
+      <div class="answer"><strong>Programmes</strong> (code), <strong>données</strong>, <strong>processus</strong> (d'affaires), <strong>règles</strong> (d'affaires) et <strong>documentation</strong>. Un logiciel n'est donc PAS que du code.</div>
+    </details>
+
+    <details>
+      <summary>Qu'est-ce que l'élicitation des exigences&nbsp;? Citez quelques techniques.</summary>
+      <div class="answer"><strong>Élicitation (ou élucidation)</strong> = <strong>obtention et explicitation</strong> des exigences (les faire émerger en discutant avec les utilisateurs). Techniques&nbsp;: lecture de documents externes, immersion dans le milieu, interviews, comparaison à d'autres systèmes, brainstorming.</div>
+    </details>
+
+    <details>
+      <summary>Quels sont les trois types d'exigences&nbsp;?</summary>
+      <div class="answer"><strong>Fonctionnelles</strong> (ce qui doit être exécuté), <strong>contraintes</strong> (les obligations) et <strong>non fonctionnelles</strong> (les propriétés du système&nbsp;: performance, sécurité, ergonomie…).</div>
+    </details>
+
+    <details>
+      <summary>Citez les caractéristiques d'une exigence de bonne qualité.</summary>
+      <div class="answer">Correcte, complète, claire (pour chaque lecteur), concise, consistante, réalisable, nécessaire, indépendante de la conception, indépendante de la technique d'implantation, vérifiable/testable et unique.</div>
+    </details>
+
+    <details>
+      <summary>Expliquez la méthode MoSCoW.</summary>
+      <div class="answer"><strong>M</strong>ust (essentiel/vital, à faire), <strong>S</strong>hould (important, si possible), <strong>C</strong>ould (confort, si ça n'affecte rien d'autre), <strong>W</strong>on't (luxe, pas maintenant mais peut-être plus tard). C'est une technique de <strong>priorisation</strong> des exigences.</div>
+    </details>
+
+    <details>
+      <summary>Pourquoi le coût de correction d'un défaut augmente-t-il avec le temps&nbsp;? Donnez l'ordre de grandeur.</summary>
+      <div class="answer">Parce qu'un défaut trouvé tard est déjà propagé dans la conception, le code, les tests et la documentation&nbsp;; il faut tout retoucher. La progression est quasi exponentielle&nbsp;: ~175&nbsp;$ aux exigences vs ~17&nbsp;713&nbsp;$ en opérations (Jones 2000) — soit ~<strong>100×</strong>. C'est la justification économique de l'AQL (détecter tôt).</div>
+    </details>
+
+    <details>
+      <summary>Quelle est la différence entre assurance qualité (AQ) et contrôle de qualité (CQ)&nbsp;? Quel lien les unit&nbsp;?</summary>
+      <div class="answer">Le <strong>CQ</strong> évalue le <strong>produit fini avant livraison</strong> (détection). L'<strong>AQ</strong> regroupe des activités <strong>tout au long du processus</strong> (prévention + détection + correction + amélioration continue). Lien clé&nbsp;: <strong>le CQ est une activité DE l'AQ</strong> (le CQ est inclus dans l'AQ).</div>
+    </details>
+
+    <details>
+      <summary>Pourquoi le terme «&nbsp;assurance qualité&nbsp;» peut-il porter à confusion&nbsp;?</summary>
+      <div class="answer">Parce que «&nbsp;assurer&nbsp;» = «&nbsp;donner la certitude&nbsp;», mais — comme «&nbsp;assurance-vie&nbsp;» — les pratiques de génie logiciel <strong>ne garantissent pas</strong> la qualité d'un projet. L'AQ <strong>réduit les risques</strong> et <strong>donne confiance</strong>, sans certitude absolue de succès.</div>
+    </details>
+
+    <details>
+      <summary>Quels sont les buts interne et externe de l'assurance qualité&nbsp;?</summary>
+      <div class="answer"><strong>Interne</strong>&nbsp;: donner confiance à la <strong>direction</strong> de l'organisation. <strong>Externe</strong>&nbsp;: en situation contractuelle, donner confiance au <strong>client</strong> (ou à des tiers).</div>
+    </details>
+
+    <details>
+      <summary>Quelle est la définition de la qualité du logiciel (ISO 24765)&nbsp;? Quelle nuance sur les besoins&nbsp;?</summary>
+      <div class="answer">Capacité d'un produit logiciel à <strong>satisfaire les besoins exprimés ET implicites (les attentes)</strong> dans des conditions spécifiées. Nuance&nbsp;: il faut satisfaire les attentes <em>non décrites</em>, et il y a plusieurs «&nbsp;utilisateurs&nbsp;» (utilisateur, installateur, mainteneur).</div>
+    </details>
+
+    <details>
+      <summary>Différence entre vérification et validation (V&amp;V)&nbsp;?</summary>
+      <div class="answer"><strong>Vérification</strong>&nbsp;: «&nbsp;A-t-on bien construit le produit&nbsp;?&nbsp;» (conforme aux specs). <strong>Validation</strong>&nbsp;: «&nbsp;A-t-on construit le bon produit&nbsp;?&nbsp;» (répond au vrai besoin du client).</div>
+    </details>
+
+    <details>
+      <summary>Que disent les études de Beizer et de Humphrey sur l'origine et la densité des défauts&nbsp;?</summary>
+      <div class="answer"><strong>Beizer</strong>&nbsp;: les erreurs viennent surtout des phases amont (structurelles 25&nbsp;%, données 22&nbsp;%, fonctionnalités 16&nbsp;%…), pas seulement du codage (10&nbsp;%). <strong>Humphrey</strong>&nbsp;: les développeurs injectent ~<strong>100 défauts/1000 lignes</strong> (1 par 10 lignes), avec de grandes variations (40 à 250). Conclusion&nbsp;: faire des défauts est normal et massif → il faut les détecter tôt.</div>
+    </details>
+  </section>
+
+  <footer>
+    Guide d'étude — Assurance qualité logicielle, Séance 1<br>
+    <span class="accent">Bon succès à ton examen, MF.</span>
+  </footer>
+
+</div>
+</body>
+</html>

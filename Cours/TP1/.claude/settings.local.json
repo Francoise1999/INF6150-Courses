@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__figma__use_figma",
+      "mcp__figma__get_metadata",
+      "mcp__figma__get_screenshot",
+      "Bash(Start-Sleep -Seconds 2)",
+      "Bash(Invoke-WebRequest -Uri \"http://localhost:8765/publier_service_basique.html\" -UseBasicParsing)",
+      "Bash(Select-Object -ExpandProperty StatusCode)",
+      "PowerShell(cd \"C:\\\\Users\\\\lizme\\\\OneDrive - UQAM\\\\Cours\\\\INF6150 - Génie logiciel - Conduite de projets informatiques\\\\Cours\\\\TP1\"; Start-Process python -ArgumentList \"-m\",\"http.server\",\"8765\" -WindowStyle Hidden; Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://localhost:8765/publier_service_basique.html\" -UseBasicParsing\\).StatusCode)",
+      "PowerShell(cd \"C:\\\\Users\\\\lizme\\\\OneDrive - UQAM\\\\Cours\\\\INF6150 - Génie logiciel - Conduite de projets informatiques\\\\Cours\\\\TP1\"; Start-Process python -ArgumentList \"-m\",\"http.server\",\"8765\" -WindowStyle Hidden; Start-Sleep -Seconds 3; \\(Invoke-WebRequest -Uri \"http://localhost:8765/publier_service_basique.html\" -UseBasicParsing\\).StatusCode)",
+      "PowerShell(python --version; node --version)",
+      "PowerShell($dir = \"C:\\\\Users\\\\lizme\\\\OneDrive - UQAM\\\\Cours\\\\INF6150 - Génie logiciel - Conduite de projets informatiques\\\\Cours\\\\TP1\"; Start-Process node -ArgumentList \"-e\",\"const h=require\\('http'\\),fs=require\\('fs'\\),p=require\\('path'\\);h.createServer\\(\\(q,r\\)=>{const f=p.join\\('$dir',q.url\\);fs.readFile\\(f,\\(e,d\\)=>{if\\(e\\){r.writeHead\\(404\\);r.end\\(\\)}else{r.writeHead\\(200,{'Content-Type':'text/html'}\\);r.end\\(d\\)}}\\)}\\).listen\\(8765\\)\" -WindowStyle Hidden; Start-Sleep -Seconds 3; \\(Invoke-WebRequest -Uri \"http://localhost:8765/publier_service_basique.html\" -UseBasicParsing\\).StatusCode)"
+    ]
+  }
+}
