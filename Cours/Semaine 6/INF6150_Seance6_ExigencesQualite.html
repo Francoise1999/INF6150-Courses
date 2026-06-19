@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INF6150 — Séance 6 : Les Exigences Qualité</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --card:      #1e2333;
+    --border:    #2a3050;
+    --accent:    #5b8dee;
+    --accent2:   #a78bfa;
+    --accent3:   #34d399;
+    --warn:      #f59e0b;
+    --danger:    #f87171;
+    --text:      #e2e8f0;
+    --muted:     #8492b4;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'IBM Plex Sans', sans-serif;
+    --serif:     'IBM Plex Serif', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.75; }
+
+  .hero {
+    background: linear-gradient(135deg, #0d1b3e 0%, #1a1040 50%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 32px 48px;
+    text-align: center;
+  }
+  .hero .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--serif); font-size: clamp(26px, 5vw, 48px); font-weight: 600;
+    line-height: 1.2; color: #fff; max-width: 820px; margin: 0 auto 16px;
+  }
+  .hero .subtitle { color: var(--muted); font-size: 15px; max-width: 600px; margin: 0 auto; font-weight: 300; }
+  .hero blockquote {
+    margin: 24px auto 0; max-width: 640px; font-family: var(--serif); font-style: italic;
+    font-size: 15px; color: #cbd5e1; border-left: 3px solid var(--accent2); padding-left: 16px; text-align: left;
+  }
+  .hero blockquote cite { display: block; margin-top: 8px; font-size: 12px; color: var(--muted); font-style: normal; font-family: var(--mono); }
+  .badge-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+  .badge {
+    background: rgba(91,141,238,.12); border: 1px solid rgba(91,141,238,.3); color: var(--accent);
+    font-family: var(--mono); font-size: 11px; padding: 4px 12px; border-radius: 99px; letter-spacing: .06em;
+  }
+
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+  nav.toc {
+    width: 240px; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    padding: 32px 20px; border-right: 1px solid var(--border); background: var(--surface);
+  }
+  nav.toc h2 { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  nav.toc a {
+    display: block; font-size: 13px; color: var(--muted); text-decoration: none;
+    padding: 5px 8px; border-radius: 6px; transition: all .15s; line-height: 1.4;
+  }
+  nav.toc a:hover { color: var(--accent); background: rgba(91,141,238,.08); }
+  nav.toc .toc-sub { padding-left: 16px; font-size: 12px; }
+
+  main { flex: 1; min-width: 0; padding: 48px 48px 80px; }
+  section { margin-bottom: 64px; }
+  section + section { border-top: 1px solid var(--border); padding-top: 64px; }
+
+  h2.section-title {
+    font-family: var(--serif); font-size: 28px; font-weight: 600; color: #fff;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+  }
+  h2.section-title .num {
+    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    background: rgba(91,141,238,.12); border: 1px solid rgba(91,141,238,.25);
+    padding: 2px 10px; border-radius: 99px;
+  }
+  h3 { font-family: var(--sans); font-size: 17px; font-weight: 600; color: var(--accent2); margin: 32px 0 12px; }
+  h4 { font-family: var(--mono); font-size: 13px; color: var(--accent3); margin: 20px 0 8px; letter-spacing: .04em; }
+  p { margin-bottom: 14px; color: var(--text); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin: 20px 0; }
+  .card.accent-l { border-left: 3px solid var(--accent); }
+  .card.accent-g { border-left: 3px solid var(--accent3); }
+  .card.accent-w { border-left: 3px solid var(--warn); }
+  .card.accent-d { border-left: 3px solid var(--danger); }
+  .card.accent-p { border-left: 3px solid var(--accent2); }
+  .card-label { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+  .def { background: rgba(91,141,238,.06); border: 1px solid rgba(91,141,238,.2); border-radius: 10px; padding: 18px 22px; margin: 16px 0; }
+  .def strong { color: var(--accent); }
+
+  .hl { color: var(--accent); font-weight: 600; }
+  .hl2 { color: var(--accent2); font-weight: 600; }
+  .hl3 { color: var(--accent3); font-weight: 600; }
+  .hlw { color: var(--warn); font-weight: 600; }
+  .hld { color: var(--danger); font-weight: 600; }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: rgba(91,141,238,.12); color: var(--accent); font-family: var(--mono); font-size: 11px;
+    letter-spacing: .08em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(42,48,80,.7); color: var(--text); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+
+  .steps { counter-reset: step; margin: 16px 0; }
+  .step { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid rgba(42,48,80,.5); }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: step; flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(91,141,238,.15); border: 1px solid var(--accent); color: var(--accent);
+    font-family: var(--mono); font-size: 12px; display: flex; align-items: center; justify-content: center;
+  }
+  .step-num::before { content: counter(step); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 700px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+  code { font-family: var(--mono); background: rgba(91,141,238,.1); color: var(--accent); padding: 1px 6px; border-radius: 4px; font-size: .88em; }
+
+  .formula {
+    background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.25); border-radius: 10px;
+    padding: 16px 22px; font-family: var(--mono); font-size: 15px; color: var(--accent3); text-align: center; margin: 16px 0;
+  }
+
+  .iso-tree { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 16px 0; }
+  .iso-root {
+    background: rgba(245,158,11,.12); border: 1px solid var(--warn); color: var(--warn);
+    font-weight: 700; text-align: center; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-family: var(--mono); font-size: 13px;
+  }
+  .iso-branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 700px) { .iso-branches { grid-template-columns: 1fr; } }
+  .iso-branch { border-radius: 8px; padding: 12px; font-size: 13px; }
+  .iso-branch.b1 { background: rgba(91,141,238,.1); border: 1px solid var(--accent); }
+  .iso-branch.b2 { background: rgba(167,139,250,.1); border: 1px solid var(--accent2); }
+  .iso-branch.b3 { background: rgba(52,211,153,.1); border: 1px solid var(--accent3); }
+  .iso-branch .branch-title { font-weight: 700; margin-bottom: 8px; text-align: center; }
+  .iso-branch ul { padding-left: 18px; color: var(--muted); font-size: 12.5px; line-height: 1.9; }
+
+  .exo-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start;
+  }
+  .exo-num { font-family: var(--mono); font-size: 12px; color: var(--accent); flex-shrink: 0; min-width: 24px; }
+  .exo-text { flex: 1; }
+  .exo-tag {
+    display: inline-block; font-family: var(--mono); font-size: 10px; padding: 3px 10px;
+    border-radius: 99px; margin-top: 8px; letter-spacing: .04em;
+  }
+  .tag-func { background: rgba(91,141,238,.15); color: var(--accent); border: 1px solid var(--accent); }
+  .tag-nonfunc { background: rgba(167,139,250,.15); color: var(--accent2); border: 1px solid var(--accent2); }
+  .tag-contrainte { background: rgba(245,158,11,.15); color: var(--warn); border: 1px solid var(--warn); }
+  .tag-affaires { background: rgba(52,211,153,.15); color: var(--accent3); border: 1px solid var(--accent3); }
+  .tag-interface { background: rgba(248,113,113,.15); color: var(--danger); border: 1px solid var(--danger); }
+  .tag-usager { background: rgba(255,255,255,.1); color: #cbd5e1; border: 1px solid #cbd5e1; }
+
+  .quiz-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 18px; overflow: hidden; }
+  .quiz-q {
+    padding: 18px 24px; cursor: pointer; display: flex; justify-content: space-between;
+    align-items: center; gap: 12px; user-select: none; font-weight: 600; color: var(--text);
+  }
+  .quiz-q:hover { background: rgba(91,141,238,.06); }
+  .quiz-q .qnum {
+    font-family: var(--mono); font-size: 11px; color: var(--warn); flex-shrink: 0;
+    background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); padding: 2px 8px; border-radius: 99px;
+  }
+  .quiz-q .arrow { color: var(--muted); flex-shrink: 0; transition: transform .2s; font-size: 18px; }
+  .quiz-q.open .arrow { transform: rotate(180deg); }
+  .quiz-a { display: none; padding: 0 24px 20px; border-top: 1px solid var(--border); padding-top: 16px; color: var(--muted); font-size: 15px; line-height: 1.7; }
+  .quiz-a.show { display: block; }
+  .quiz-a strong { color: var(--accent3); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media(max-width:900px){ nav.toc { display: none; } main { padding: 32px 20px 60px; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">INF6150 · Chapitre 5 · UQAM</div>
+  <h1>Les exigences qualité</h1>
+  <p class="subtitle">Guide d'étude exhaustif : ingénierie des exigences, modèle ISO/IEC 25000, et tout l'exercice corrigé.</p>
+  <blockquote>
+    "Dans les systèmes réels, le fait de répondre aux exigences non-fonctionnelles est souvent plus important que de satisfaire les exigences fonctionnelles, au moment de déterminer le succès ou l'échec d'un système."
+    <cite>— Dr. Robert Charette, Itabhi Corporation</cite>
+  </blockquote>
+  <div class="badge-row">
+    <span class="badge">Élicitation · Analyse · Spécification · Validation</span>
+    <span class="badge">ISO/IEC 25000</span>
+    <span class="badge">RFP / SOW / CONOPS</span>
+    <span class="badge">Traçabilité</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <nav class="toc">
+    <h2>Contenu</h2>
+    <a href="#ingenierie">Ingénierie des exigences</a>
+    <a class="toc-sub" href="#elicitation">→ Élicitation</a>
+    <a class="toc-sub" href="#analyse">→ Analyse</a>
+    <a class="toc-sub" href="#specification">→ Spécification</a>
+    <a class="toc-sub" href="#validation">→ Validation</a>
+    <a href="#types">Types d'exigences</a>
+    <a href="#alignement">Alignement & exemple bibliothèque</a>
+    <a href="#exercice">🏛️ Exercice corrigé (15 items)</a>
+    <a href="#mauvaises">Mauvaises exigences</a>
+    <a href="#parties">Parties prenantes</a>
+    <a href="#droits">Droits & obligations</a>
+    <a href="#pratiques">Bonnes pratiques (Wiegers)</a>
+    <a href="#iso25000">Modèle ISO/IEC 25000</a>
+    <a class="toc-sub" href="#qualite-fonct">→ Qualité de fonctionnement</a>
+    <a class="toc-sub" href="#qualite-produit">→ Qualité du produit</a>
+    <a href="#definition-exigences">5.3 Définir les exigences qualité</a>
+    <a href="#caracteristiques">Caractéristiques recherchées</a>
+    <a href="#stm">Cas STM</a>
+    <a href="#excuses">Liste d'excuses</a>
+    <a href="#facteurs">Facteurs de succès</a>
+    <a href="#etudes-cas">Études de cas (corrigées)</a>
+    <a href="#quiz">🎯 Questions d'examen</a>
+  </nav>
+
+  <main>
+
+    <section id="ingenierie">
+      <h2 class="section-title"><span class="num">5.1</span> Ingénierie des exigences</h2>
+
+      <div class="def">
+        <strong>📐 Ingénierie des exigences</strong><br>
+        C'est la discipline qui englobe <strong>toutes les activités liées aux exigences</strong> d'un logiciel, du début (recueillir les besoins) jusqu'à la fin (s'assurer qu'on construit le bon produit). Elle se divise en deux grandes branches :
+      </div>
+
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">Branche 1</div>
+          <strong class="hl">Développement des exigences</strong>
+          <p style="margin-top:8px;">Le processus de <em>création</em> des exigences. Se découpe en 4 étapes : Élicitation → Analyse → Spécification → Validation.</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Branche 2</div>
+          <strong class="hl2">Gestion des exigences</strong>
+          <p style="margin-top:8px;">Le processus de <em>suivi</em> des exigences une fois créées : contrôle des changements, traçabilité, gestion des versions.</p>
+        </div>
+      </div>
+
+      <p style="margin-top:20px;">Le cours se concentre principalement sur le <strong>développement des exigences</strong>, qui suit un processus en 4 étapes séquentielles (mais souvent itératives en pratique) :</p>
+
+      <div class="formula">Élicitation → Analyse → Spécification → Validation</div>
+
+      <h3 id="elicitation">1️⃣ Élicitation (Elicitation)</h3>
+      <div class="def">
+        <strong>🔍 Élicitation</strong> = l'art de <strong>découvrir et faire émerger</strong> les besoins des parties prenantes. Le mot vient de "élucider" — on cherche à clarifier ce que les gens veulent, même quand ils ne savent pas encore comment l'exprimer.
+      </div>
+      <p>Les 4 activités principales de l'élicitation :</p>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div><strong>Identifier les intervenants (stakeholders)</strong> et les classes d'usagers du système cible — qui va utiliser ce système, et qui a un intérêt dans son succès ?</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Comprendre les tâches et objectifs des usagers</strong>, ainsi que les objectifs d'affaires correspondants — pourquoi cette personne utilise le système ? Quel problème d'affaires cela résout-il ?</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Se renseigner sur le contexte d'utilisation</strong> du nouveau produit — où, quand, comment le produit sera-t-il utilisé ?</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Travailler avec des représentants de chaque classe d'usagers</strong> pour cerner leurs besoins fonctionnels ET leurs attentes de qualité.</div></div>
+      </div>
+
+      <h3 id="analyse">2️⃣ Analyse</h3>
+      <div class="def">
+        <strong>🔬 Analyse</strong> = <strong>traduire les exigences de l'usager en spécifications du logiciel</strong>. C'est le pont entre "ce que veut l'humain" et "ce que le système doit faire techniquement".
+      </div>
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">Vue externe du logiciel</div>
+          <p>Le <strong>comportement externe</strong> du logiciel : ses fonctionnalités, et les dépendances entre fonctionnalités (interfaces offertes). C'est ce que l'utilisateur voit et utilise.</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Conception et implémentation</div>
+          <p><strong>Comment réaliser</strong> les spécifications — l'architecture interne, les choix technologiques qui permettront de livrer ce comportement externe.</p>
+        </div>
+      </div>
+
+      <h3 id="specification">3️⃣ Spécification</h3>
+      <div class="def">
+        <strong>📝 Spécification</strong> = <strong>mettre en forme</strong> les exigences élicitées et analysées, sous une forme permettant leur compréhension, révision, et utilisation par les usagers cibles. Ça peut être : des documents, des diagrammes, etc.
+      </div>
+
+      <p>Les besoins/exigences sont documentés dans plusieurs types de documents :</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Document</th><th>Acronyme</th><th>Rôle</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Document d'appel d'offres</strong></td><td><code>RFP</code> (Request for Proposal)</td><td>Document envoyé à des fournisseurs potentiels pour qu'ils proposent une solution</td></tr>
+            <tr><td><strong>Cahier des charges</strong></td><td><code>SOW</code> (Statement of Work)</td><td>Décrit le système à construire en détail — l'énoncé du travail à faire</td></tr>
+            <tr><td><strong>Document du concept d'opération</strong></td><td><code>CONOPS</code> / Document de Vision</td><td>Décrit la vision globale, comment le système sera utilisé dans son contexte opérationnel</td></tr>
+            <tr><td><strong>Document des spécifications du système</strong></td><td>—</td><td>Détaille les exigences techniques précises</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card accent-w">
+        <div class="card-label">⚙️ Le travail de l'ingénieur logiciel</div>
+        <p>À partir de ces documents, l'ingénieur logiciel doit <strong>extraire les informations nécessaires</strong> pour rédiger le document de spécifications, en séparant clairement :</p>
+        <ul style="padding-left:20px;line-height:2;margin-top:8px;">
+          <li><strong class="hl">Les exigences fonctionnelles</strong> — ce que le système doit FAIRE</li>
+          <li><strong class="hl2">Les exigences non-fonctionnelles</strong> — comment le système doit le faire (qualité)</li>
+        </ul>
+      </div>
+
+      <h3 id="validation">4️⃣ Validation</h3>
+      <div class="def">
+        <strong>✅ Validation</strong> = la dernière étape avant de transmettre le travail à l'équipe de développement. Elle a 2 objectifs :
+      </div>
+      <div class="grid2">
+        <div class="card accent-g">
+          <div class="card-label">Objectif 1</div>
+          <p><strong>Réviser les exigences documentées</strong> pour identifier et corriger les problèmes éventuels (ambiguïtés, contradictions, oublis) avant de les transmettre aux développeurs.</p>
+        </div>
+        <div class="card accent-g">
+          <div class="card-label">Objectif 2</div>
+          <p><strong>Développer des tests et critères d'acceptation</strong> du logiciel — comment saura-t-on que le logiciel répond bien aux exigences documentées ?</p>
+        </div>
+      </div>
+
+      <div class="card accent-p">
+        <div class="card-label">🔄 Le processus n'est pas linéaire</div>
+        <p>Un diagramme du cours (Hafedh Mili, 2014) rappelle que ces 4 étapes forment en réalité une <strong>boucle itérative</strong> :</p>
+        <p style="margin-top:8px;">Élicitation → Analyse → Spécification → Validation, mais à chaque étape on peut devoir <span class="hl2">clarifier</span>, <span class="hl2">ré-écrire</span>, <span class="hl2">ré-évaluer</span> ou <span class="hl2">compléter</span> les exigences en revenant en arrière. Ce n'est jamais "fini" du premier coup.</p>
+      </div>
+    </section>
+
+    <section id="types">
+      <h2 class="section-title"><span class="num">📋</span> Types d'exigences</h2>
+
+      <h3>Exigence fonctionnelle</h3>
+      <div class="def">
+        <strong>Définition (ISO 24765) :</strong> "Une déclaration qui indique ce qu'un produit ou un processus doit accomplir pour produire le comportement et/ou les résultats requis."
+      </div>
+      <p>Les exigences fonctionnelles <strong>décrivent le comportement</strong> que le système doit avoir pour que les usagers puissent réaliser leurs tâches/objectifs.</p>
+      <div class="card accent-l">
+        <div class="card-label">Formulation</div>
+        <p>Elles sont formulées sous forme <strong>d'obligation / impératif</strong> : on utilise <code>shall</code> (doit) plutôt que <code>should</code> (devrait). En français : "Le système DOIT..." plutôt que "le système pourrait...".</p>
+        <p style="margin-top:10px;"><strong>Exemples :</strong></p>
+        <ul style="padding-left:20px;line-height:2;margin-top:6px;color:var(--muted);">
+          <li>Le système DOIT afficher un horaire modifié après l'ajout d'un cours</li>
+          <li>Le système DOIT proposer au client d'autres livres reliés à ceux inclus dans son panier d'achat</li>
+        </ul>
+      </div>
+
+      <h3>Exigence non-fonctionnelle</h3>
+      <div class="def">
+        <strong>Définition (ISO 24765) :</strong> "Une exigence logicielle qui ne décrit pas <em>ce que</em> le logiciel va faire, mais <em>comment</em> le logiciel va le faire. Synonyme : contraintes de conception."
+      </div>
+      <div class="card accent-p">
+        <p>C'est la différence la plus importante du chapitre. Pensez-y comme ceci :</p>
+        <div class="grid2" style="margin-top:12px;">
+          <div style="background:rgba(91,141,238,.08);padding:14px;border-radius:8px;">
+            <strong class="hl">Fonctionnel = QUOI</strong><br>
+            <span style="color:var(--muted);font-size:14px;">"Le système permet de chercher un livre"</span>
+          </div>
+          <div style="background:rgba(167,139,250,.08);padding:14px;border-radius:8px;">
+            <strong class="hl2">Non-fonctionnel = COMMENT</strong><br>
+            <span style="color:var(--muted);font-size:14px;">"...et la recherche doit retourner un résultat en moins de 2 secondes"</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Le diagramme "Exigences de qualité" (slide 12)</h3>
+      <p>Ce diagramme montre comment les différents types d'exigences sont reliés entre eux dans un flux global :</p>
+      <div class="card accent-w">
+        <ul style="padding-left:20px;line-height:2.2;color:var(--muted);">
+          <li><strong class="hlw">Règles d'affaires</strong> influencent à la fois les exigences d'affaires ET les attributs qualité</li>
+          <li><strong class="hlw">Exigences d'affaires</strong> → produisent le <strong>Document de vision & portée</strong></li>
+          <li>De ce document découlent les <strong>exigences usager</strong> → documentées dans le <strong>Document exigences usager</strong></li>
+          <li>Les exigences usager + exigences système → <strong>exigences fonctionnelles</strong></li>
+          <li>Les <strong>exigences fonctionnelles</strong> + <strong>attributs qualité</strong> + <strong>interfaces externes</strong> + <strong>contraintes</strong> se rassemblent tous dans le <strong>Document de Spécification des Exigences Logicielles (SEL)</strong></li>
+        </ul>
+      </div>
+      <p style="color:var(--muted);font-size:14px;">💡 <strong>SEL = Spécification des Exigences Logicielles</strong> (en anglais SRS, Software Requirements Specification). C'est LE document final qui rassemble tout.</p>
+
+      <h3>Exemple : système de gestion d'admission (assurance)</h3>
+      <div class="grid3">
+        <div class="card accent-g">
+          <div class="card-label">Exigences d'affaires</div>
+          <p style="font-size:14px;">Pourquoi le système existe — ex: réduire le temps de traitement des demandes d'assurance, respecter la réglementation.</p>
+        </div>
+        <div class="card accent-l">
+          <div class="card-label">Exigences usager</div>
+          <p style="font-size:14px;">Ce que les agents et clients ont besoin de faire — ex: soumettre une demande, vérifier l'admissibilité.</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Exigences fonctionnelles</div>
+          <p style="font-size:14px;">Le système DOIT vérifier que l'assuré a 18 ans et détient un permis du Québec.</p>
+        </div>
+      </div>
+
+      <div class="def" style="margin-top:16px;">
+        <strong>Exemple de règles d'affaires (slide 14) :</strong>
+        <ul style="padding-left:20px;line-height:2;margin-top:8px;">
+          <li>L'assuré doit être âgé de 18 ans</li>
+          <li>L'assuré(e) doit détenir un permis du Québec</li>
+          <li>Réglementations gouvernementales dans le domaine de l'assurance</li>
+          <li>Sécurité et confidentialité des données personnelles</li>
+        </ul>
+        <p style="margin-top:8px;color:var(--muted);font-size:14px;">Notez que certaines règles d'affaires (âge, permis) deviennent des exigences fonctionnelles (validations dans le système), tandis que d'autres (confidentialité) deviennent des exigences non-fonctionnelles (sécurité).</p>
+      </div>
+    </section>
+
+    <section id="alignement">
+      <h2 class="section-title"><span class="num">🔗</span> Alignement des exigences</h2>
+      <div class="def">
+        <strong>Principe clé :</strong> Nous devons avoir un <strong>alignement</strong> entre :
+        <ul style="padding-left:20px;line-height:2;margin-top:8px;">
+          <li><span class="hl3">Exigences d'affaires</span> (pourquoi on fait ça)</li>
+          <li><span class="hl">Exigences usagers</span> (ce que les gens ont besoin de faire)</li>
+          <li><span class="hl2">Exigences fonctionnelles</span> (ce que le système doit techniquement faire)</li>
+        </ul>
+      </div>
+      <div class="card accent-d">
+        <div class="card-label">⚠️ Pourquoi c'est crucial</div>
+        <p>Si une exigence fonctionnelle ne se rattache à AUCUNE exigence usager ou d'affaires, c'est un signal d'alarme : pourquoi développe-t-on cette fonctionnalité ? À l'inverse, si une exigence d'affaires n'a aucune exigence fonctionnelle qui y correspond, cet objectif d'affaires ne sera jamais atteint par le logiciel. <strong>L'alignement, c'est s'assurer qu'il n'y a pas de "trous" dans la chaîne.</strong></p>
+      </div>
+    </section>
+    <section id="exercice">
+      <h2 class="section-title"><span class="num">🏛️</span> Exercice corrigé — Système de gestion de bibliothèque</h2>
+      <p>Voici les 15 énoncés de l'exercice, <strong>classés et expliqués</strong> selon les catégories vues en cours : exigence fonctionnelle, non-fonctionnelle, contrainte, d'affaires/du domaine, d'interface externe, ou exigence usager.</p>
+
+      <div class="card accent-l">
+        <div class="card-label">Rappel des catégories</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="exo-tag tag-func">Fonctionnelle</span>
+          <span class="exo-tag tag-nonfunc">Non-fonctionnelle</span>
+          <span class="exo-tag tag-contrainte">Contrainte</span>
+          <span class="exo-tag tag-affaires">Affaires / Domaine</span>
+          <span class="exo-tag tag-interface">Interface externe</span>
+          <span class="exo-tag tag-usager">Usager</span>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+
+        <div class="exo-item">
+          <div class="exo-num">1</div>
+          <div class="exo-text">
+            "Le système doit avoir une interface conviviale"
+            <div class="exo-tag tag-nonfunc">Non-fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">"Conviviale" décrit une <strong>qualité de l'interface</strong> (facilité d'utilisation / Usability), pas une fonction précise. Ça ne dit pas QUOI le système fait, mais COMMENT il doit se comporter pour l'usager. Note : c'est aussi un exemple d'exigence <em>ambiguë</em> — "convivial" n'est pas mesurable tel quel !</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">2</div>
+          <div class="exo-text">
+            "Le système doit fournir des outils facilitant la lecture des différents formats de fichiers dans la BD"
+            <div class="exo-tag tag-func">Fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci décrit une <strong>capacité concrète</strong> que le système doit avoir : lire plusieurs formats de fichiers. C'est une fonctionnalité précise et implémentable.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">3</div>
+          <div class="exo-text">
+            "Le système permet aux bibliothécaires de classifier les documents"
+            <div class="exo-tag tag-func">Fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Action concrète qu'un type d'usager (le bibliothécaire) peut effectuer dans le système. C'est ce que le système FAIT.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">4</div>
+          <div class="exo-text">
+            "Le système permet aux clients d'emprunter, de louer et de réserver des documents"
+            <div class="exo-tag tag-func">Fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Trois fonctionnalités concrètes pour la classe d'usager "client". On pourrait même la décomposer en 3 exigences fonctionnelles distinctes (une par action) pour respecter le critère "concise / une seule idée par exigence".</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">5</div>
+          <div class="exo-text">
+            "L'interface du système doit être implémentée, en utilisant Python et Django"
+            <div class="exo-tag tag-contrainte">Contrainte</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci impose une <strong>limite de développement</strong> : le langage de programmation et le framework à utiliser. Ce n'est ni une fonctionnalité, ni une qualité — c'est une décision technique imposée de l'extérieur. Rappel du cours : les contraintes incluent "le langage de programmation qui doit être utilisé".</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">6</div>
+          <div class="exo-text">
+            "Le processus de développement adopté doit respecter la norme ISO29110"
+            <div class="exo-tag tag-contrainte">Contrainte</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci ne concerne pas le logiciel lui-même mais <strong>le processus de développement</strong> — une limite imposée sur la manière de travailler de l'équipe. C'est une contrainte de gestion/organisationnelle.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">7</div>
+          <div class="exo-text">
+            "Le système ne doit pas permettre la visualisation des informations personnelles des étudiants et professeurs"
+            <div class="exo-tag tag-nonfunc">Non-fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci touche directement la caractéristique <strong>Sécurité</strong> de l'ISO 25000, plus précisément la <em>Confidentialité</em> : "les informations et données sont protégées de façon à ce que des personnes non autorisées ne peuvent pas les lire ou les modifier". C'est une propriété du système, pas une action qu'il effectue.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">8</div>
+          <div class="exo-text">
+            "Le système doit s'interfacer avec le système de gestion des étudiants et enseignants"
+            <div class="exo-tag tag-interface">Exigence d'interface externe</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci décrit une <strong>connexion vers un autre système externe</strong>. Le diagramme "Exigences de qualité" (slide 12) place explicitement les "Interfaces externes" comme une catégorie à part qui alimente le document SEL. C'est lié à la caractéristique de <strong>Compatibilité / Interopérabilité</strong> de l'ISO 25000.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">9</div>
+          <div class="exo-text">
+            "Le système doit pouvoir supporter plusieurs utilisateurs simultanément"
+            <div class="exo-tag tag-nonfunc">Non-fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci décrit une <strong>capacité de performance</strong> (concurrence/charge), donc lié à l'<em>Efficacité du rendement (Performance Efficiency)</em> de l'ISO 25000 — "utilisation des ressources" et "comportement vis-à-vis du temps" sous charge multiple.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">10</div>
+          <div class="exo-text">
+            "Le temps d'enregistrement d'une réservation ne doit pas dépasser 3 secondes"
+            <div class="exo-tag tag-nonfunc">Non-fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">C'est l'exemple PARFAIT du cours : "le temps de réponse" (slide 35). Ceci correspond exactement à la sous-caractéristique <strong>Comportement vis-à-vis du temps</strong>, sous-caractéristique du <strong>Rendement</strong>. La formule donnée en cours est T = A - B (temps de réponse = temps de fin - temps de début de la tâche).</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">11</div>
+          <div class="exo-text">
+            "Le système doit être capable de répertorier les ouvrages retournés par les étudiants et enseignants"
+            <div class="exo-tag tag-func">Fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Action concrète : tenir un registre des retours. C'est une fonctionnalité de gestion des stocks/inventaire du système.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">12</div>
+          <div class="exo-text">
+            "Le système doit empêcher à un étudiant dont sa carte d'étudiant est expirée, de réserver ou d'emprunter un livre"
+            <div class="exo-tag tag-func">Fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Bien que ça contienne le mot "empêcher" (sécurité), il s'agit ici d'une <strong>règle métier appliquée par une fonction</strong> : le système doit VÉRIFIER la validité de la carte avant d'AUTORISER une action. C'est une logique fonctionnelle (une validation métier), comparable à "le système DOIT vérifier que l'assuré a 18 ans" (slide 14).</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">13</div>
+          <div class="exo-text">
+            "Le système doit permettre aux étudiants-es de payer leur amende en ligne, soit par carte de débit ou de crédit"
+            <div class="exo-tag tag-func">Fonctionnelle</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Fonctionnalité concrète offerte aux usagers (paiement en ligne). Notez que l'aspect "moyens de paiement précis" pourrait aussi indiquer une dépendance vers un système externe (voir #14).</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">14</div>
+          <div class="exo-text">
+            "Le système doit pouvoir interagir avec les systèmes bancaires"
+            <div class="exo-tag tag-interface">Exigence d'interface externe</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Comme #8, c'est une connexion explicite vers un <strong>système externe</strong> (les systèmes bancaires, pour traiter le paiement de #13). Ces deux exigences (13 et 14) sont d'ailleurs un bon exemple d'<strong>alignement</strong> : une exigence fonctionnelle (#13) qui nécessite une exigence d'interface externe (#14) pour être réalisable.</p>
+          </div>
+        </div>
+
+        <div class="exo-item">
+          <div class="exo-num">15</div>
+          <div class="exo-text">
+            "La bibliothèque veut augmenter de 20% le nombre de prêts de livres"
+            <div class="exo-tag tag-affaires">Exigence d'affaires</div>
+            <p style="margin-top:8px;color:var(--muted);font-size:14px;">Ceci est un <strong>objectif d'affaires de haut niveau</strong> — c'est le "pourquoi" derrière le projet, formulé en termes de résultats organisationnels (un % d'augmentation), pas en termes de comportement du système. C'est typiquement ce qu'on retrouve dans un Document de Vision (rappel du diagramme slide 12 : Exigences d'affaires → Document de vision & portée).</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card accent-g" style="margin-top:20px;">
+        <div class="card-label">💡 À retenir de cet exercice</div>
+        <p>Pour classer une exigence, posez-vous 3 questions :</p>
+        <ol style="padding-left:20px;line-height:2;margin-top:6px;">
+          <li><strong>Décrit-elle une action/comportement du système ?</strong> → Fonctionnelle</li>
+          <li><strong>Décrit-elle une propriété/qualité (vitesse, sécurité, convivialité, capacité) ?</strong> → Non-fonctionnelle</li>
+          <li><strong>Impose-t-elle une technologie, un standard, ou une limite de développement ?</strong> → Contrainte</li>
+          <li><strong>Mentionne-t-elle un système externe avec lequel échanger des données ?</strong> → Interface externe</li>
+          <li><strong>Décrit-elle un objectif organisationnel/un résultat d'affaires (pas un comportement système) ?</strong> → Exigence d'affaires</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="mauvaises">
+      <h2 class="section-title"><span class="num">⚠️</span> Mauvaises exigences : conséquences et causes</h2>
+
+      <h3>Conséquences</h3>
+      <div class="grid2">
+        <div class="card accent-d">
+          <div class="card-label">Impact projet</div>
+          <p><strong>Refaire une partie du travail</strong> — coût supplémentaire, retard, dégradation de la qualité. C'est le scénario le plus coûteux : recoder une fonctionnalité parce qu'elle ne répondait pas au bon besoin.</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Impact humain</div>
+          <p><strong>Développeurs frustrés</strong> (travail jeté à la poubelle), <strong>clients pas contents</strong> (le produit ne correspond pas à ce qu'ils voulaient), <strong>promoteurs fâchés</strong> (le budget/échéancier dérape).</p>
+        </div>
+      </div>
+
+      <h3>Causes principales</h3>
+      <div class="card accent-w">
+        <div class="card-label">Cause 1 — Faible implication des usagers</div>
+        <p>Le cours insiste : c'est une <strong>faute partagée</strong> entre analystes, clients ET gestionnaires. Si personne ne pousse pour impliquer les vrais usagers (pas juste leurs gestionnaires), les exigences seront basées sur des suppositions.</p>
+      </div>
+      <div class="card accent-w">
+        <div class="card-label">Cause 2 — "Requirements creep" (dérive des exigences)</div>
+        <p>Phénomène où de nouvelles exigences s'ajoutent continuellement sans contrôle, faisant grossir le projet de façon incontrôlée. <strong>Solution :</strong> bien "baliser" (délimiter) la portée du système au départ, pour savoir précisément quoi inclure et quoi exclure (rappel : Séance 2, "Les limites du projet").</p>
+      </div>
+      <div class="card accent-w">
+        <div class="card-label">Cause 3 — Exigences ambiguës</div>
+        <p>Deux sous-causes : exigences <strong>peu détaillées/développées</strong> (trop vagues pour être implémentées sans interprétation), et <strong>utilisation de termes ambigus</strong> (ex: "convivial", "rapide", "facile" — sans définition mesurable).</p>
+      </div>
+      <div class="card accent-w">
+        <div class="card-label">Cause 4 — Intervenant négligé</div>
+        <p>Deux cas : (1) <strong>une classe d'usagers entière n'est pas représentée</strong> dans le processus (ex: on oublie de consulter les bibliothécaires et on ne parle qu'aux étudiants), ou (2) <strong>un "détenteur de contenu" d'exigences est absent</strong> — par exemple un expert en taxation ou en comptabilité dont l'expertise est nécessaire pour valider certaines règles métier.</p>
+      </div>
+    </section>
+
+    <section id="parties">
+      <h2 class="section-title"><span class="num">👥</span> Parties prenantes (stakeholders)</h2>
+
+      <div class="def">
+        <strong>Distinction clé :</strong> <span class="hl">Client</span> (porteur des exigences d'affaires) ≠ <span class="hl2">Usager</span> (porteur des exigences usager). Ce sont souvent des personnes différentes ! Le client paye/commande, l'usager utilise au quotidien.
+      </div>
+
+      <p>Le cours catégorise les parties prenantes en 3 grands groupes :</p>
+
+      <div class="grid3">
+        <div class="card accent-l">
+          <div class="card-label">Équipe projet</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Gestionnaire de projet</li>
+            <li>Analyste d'affaires</li>
+            <li>Architecte d'application</li>
+            <li>Concepteur</li>
+            <li>Développeur</li>
+            <li>Architecte de données</li>
+            <li>Analyste de processus</li>
+            <li>Testeur</li>
+          </ul>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Organisation qui développe</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Gestionnaire de produit</li>
+            <li>Personnel QA</li>
+            <li>Administrateur BD</li>
+            <li>Rédacteur de documentation</li>
+            <li>Gestionnaire de développement</li>
+            <li>Marketing</li>
+            <li>Support opérationnel</li>
+            <li>Services juridiques</li>
+            <li>Ventes, PMO, etc.</li>
+          </ul>
+        </div>
+        <div class="card accent-g">
+          <div class="card-label">Externes à l'organisation</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Utilisateurs directs/indirects</li>
+            <li>Acheteurs</li>
+            <li>Sous-traitants</li>
+            <li>Agence gouvernementale</li>
+            <li>Subject matter experts</li>
+            <li>Auditeur de conformité</li>
+            <li>Agence réglementaire</li>
+            <li>Investisseur</li>
+            <li>Testeur bêta, certificateur</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card accent-w" style="margin-top:16px;">
+        <div class="card-label">💡 Pourquoi cette liste exhaustive ?</div>
+        <p>Cette taxonomie répond directement à la "Cause 4" des mauvaises exigences (intervenant négligé). En revoyant cette liste systématiquement pour chaque projet, on diminue le risque d'oublier une classe importante de parties prenantes.</p>
+      </div>
+    </section>
+
+    <section id="droits">
+      <h2 class="section-title"><span class="num">🤝</span> Droits et obligations des clients/usagers</h2>
+
+      <div class="def">
+        L'ingénierie des exigences est une <strong>collaboration</strong> entre ceux qui développent et ceux qui utiliseront le logiciel. Pour que ça fonctionne, il y a un "contrat" implicite : les clients ont des <span class="hl3">droits</span>, mais aussi des <span class="hlw">responsabilités</span>.
+      </div>
+
+      <div class="grid2">
+        <div class="card accent-g">
+          <div class="card-label">✅ Droits des clients</div>
+          <ul style="padding-left:18px;font-size:14px;line-height:2;color:var(--muted);">
+            <li>Un(e) analyste d'affaires qui parle votre langage</li>
+            <li>Qui apprend votre métier et vos objectifs</li>
+            <li>Qui enregistre vos exigences sous le bon format</li>
+            <li>Une explication des pratiques et livrables</li>
+            <li>Pouvoir changer vos exigences</li>
+            <li>Une ambiance de respect mutuel</li>
+            <li>Être informé de différentes façons de satisfaire vos exigences</li>
+            <li>Décrire les caractéristiques pour rendre le produit facile à utiliser</li>
+            <li>Être informé de façons d'ajuster vos exigences pour accélérer le développement</li>
+            <li><strong class="hl3">Recevoir un système qui répond à vos besoins fonctionnels ET de qualité !</strong></li>
+          </ul>
+        </div>
+        <div class="card accent-w">
+          <div class="card-label">📌 Obligations des clients/usagers</div>
+          <ul style="padding-left:18px;font-size:14px;line-height:2;color:var(--muted);">
+            <li>Apprendre votre métier aux analystes et développeurs</li>
+            <li>Prendre le temps de fournir et clarifier les exigences</li>
+            <li>Être clair et précis quand vous donnez de l'information</li>
+            <li>Prendre des décisions rapidement (timely)</li>
+            <li>Respecter l'évaluation de coût/faisabilité des développeurs</li>
+            <li>Mettre des priorités réalistes, en concertation</li>
+            <li>Réviser les documents d'exigences et évaluer les prototypes</li>
+            <li>Établir des critères d'acceptation du logiciel</li>
+            <li>Communiquer les changements le plus vite possible</li>
+            <li>Respecter le processus de développement des exigences</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card accent-p" style="margin-top:16px;">
+        <div class="card-label">💭 La logique derrière ce "contrat"</div>
+        <p>Ce concept est important parce qu'il <strong>responsabilise les deux parties</strong>. On entend souvent "le client a toujours raison" — mais en ingénierie des exigences, le client a des devoirs précis (être disponible, décider rapidement, établir des priorités). Si le client ne respecte pas ses obligations, c'est lui qui contribue aux "mauvaises exigences" et au "requirements creep".</p>
+      </div>
+    </section>
+    <section id="pratiques">
+      <h2 class="section-title"><span class="num">🛠️</span> Bonnes pratiques pour l'ingénierie des exigences</h2>
+
+      <div class="card accent-d">
+        <div class="card-label">⚠️ Pas de recette magique</div>
+        <p>Le cours est très clair : <strong>"Pas de processus ou de notation magique qui permettra de livrer systématiquement des exigences de bonne qualité."</strong> Ce qui existe, c'est un ensemble de <strong>pratiques éprouvées</strong>, recensées par des praticiens expérimentés (Sommerville & Sawyer 1997, Hofmann & Lehner 2001, Gottesdiener 2005, IIBA 2009).</p>
+      </div>
+
+      <p><strong>Karl Wiegers</strong> a identifié un ensemble de pratiques pertinentes pour chaque activité du génie des exigences. <strong>Il faut adapter leur utilisation</strong> selon le projet (nature, taille, risque, réglementations applicables).</p>
+
+      <p>Voici les pratiques de Wiegers, organisées selon les 4 étapes du processus + 2 dimensions transversales :</p>
+
+      <div class="grid3" style="margin-top:16px;">
+        <div class="card accent-l">
+          <div class="card-label">Élicitation</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Définir la vision et la portée</li>
+            <li>Identifier les classes d'usagers</li>
+            <li>Sélectionner des "champions" produit</li>
+            <li>Mener des focus groups</li>
+            <li>Identifier les exigences usager</li>
+            <li>Identifier événements/réponses du système</li>
+            <li>Mener des entrevues / ateliers d'élicitation</li>
+            <li>Observer les usagers au travail</li>
+            <li>Distribuer des questionnaires</li>
+            <li>Analyser des documents existants</li>
+            <li>Examiner les rapports de problèmes</li>
+            <li>Réutiliser des exigences existantes</li>
+          </ul>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Analyse</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Modéliser l'environnement applicatif</li>
+            <li>Créer des prototypes</li>
+            <li>Analyser la faisabilité</li>
+            <li>Prioriser les exigences</li>
+            <li>Créer un dictionnaire de données</li>
+            <li>Modéliser les exigences</li>
+            <li>Analyser les interfaces</li>
+            <li>Allouer les exigences aux sous-systèmes</li>
+          </ul>
+        </div>
+        <div class="card accent-g">
+          <div class="card-label">Spécification</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Adopter des gabarits de documents</li>
+            <li>Identifier l'origine des exigences</li>
+            <li>Étiqueter chaque exigence de façon unique</li>
+            <li>Enregistrer les règles d'affaires</li>
+            <li>Spécifier les exigences non-fonctionnelles</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid3" style="margin-top:16px;">
+        <div class="card accent-w">
+          <div class="card-label">Validation</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Revoir les exigences</li>
+            <li>Tester les exigences</li>
+            <li>Définir les critères d'acceptation</li>
+            <li>Simuler les exigences</li>
+          </ul>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">Gestion des exigences</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Établir un processus de contrôle des changements</li>
+            <li>Effectuer une analyse d'impact des changements</li>
+            <li>Établir des baselines et versions</li>
+            <li>Maintenir l'historique des changements</li>
+            <li>Suivre le statut des exigences</li>
+            <li>Suivre les enjeux liés aux exigences</li>
+            <li>Maintenir une <strong>matrice de traçabilité</strong></li>
+            <li>Utiliser un outil de gestion des exigences</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:3px solid #cbd5e1;">
+          <div class="card-label" style="color:#cbd5e1;">Connaissance & Gestion de projet</div>
+          <ul style="padding-left:16px;font-size:13px;color:var(--muted);line-height:1.9;">
+            <li>Former les analystes d'affaires</li>
+            <li>Éduquer les parties prenantes sur les exigences</li>
+            <li>Éduquer les développeurs sur le domaine</li>
+            <li>Créer un glossaire</li>
+            <li>Sélectionner un cycle de vie approprié</li>
+            <li>Estimer l'effort des exigences</li>
+            <li>Renégocier les engagements</li>
+            <li>Gérer les risques liés aux exigences</li>
+            <li>Réviser les leçons apprises</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="iso25000">
+      <h2 class="section-title"><span class="num">⭐</span> Modèle de qualité ISO/IEC 25000</h2>
+
+      <div class="def">
+        <strong>📐 ISO/IEC 25000 (SQuaRE)</strong> — <em>Software Quality Requirements and Evaluation</em>. C'est LA norme internationale de référence pour définir, mesurer et évaluer la qualité d'un logiciel. Elle se divise en 3 grands modèles.
+      </div>
+
+      <div class="iso-tree">
+        <div class="iso-root">Modèle de qualité ISO/IEC 25000</div>
+        <div class="iso-branches">
+          <div class="iso-branch b1">
+            <div class="branch-title" style="color:var(--accent);">Qualité de fonctionnement<br><span style="font-size:11px;color:var(--muted);">(Quality in Use)</span></div>
+            <p style="color:var(--muted);font-size:12px;">Évalue la qualité <strong>du point de vue de l'utilisateur final</strong>, dans son contexte réel d'utilisation.</p>
+          </div>
+          <div class="iso-branch b2">
+            <div class="branch-title" style="color:var(--accent2);">Qualité du produit</div>
+            <p style="color:var(--muted);font-size:12px;">Évalue les <strong>propriétés intrinsèques du logiciel</strong> lui-même (8 caractéristiques).</p>
+          </div>
+          <div class="iso-branch b3">
+            <div class="branch-title" style="color:var(--accent3);">Qualité des données</div>
+            <p style="color:var(--muted);font-size:12px;">Évalue la qualité <strong>des données</strong> manipulées par le système (exactitude, complétude, etc.)</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Structure hiérarchique du modèle (slide 35)</h3>
+      <p>Chaque modèle de qualité se décompose en 4 niveaux, du plus général au plus précis :</p>
+
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div><strong class="hl">Caractéristiques</strong> (Characteristics) — ex: Rendement</div></div>
+        <div class="step"><div class="step-num"></div><div><strong class="hl2">Sous-caractéristiques</strong> (Sub-characteristics) — ex: Comportement vis-à-vis du temps</div></div>
+        <div class="step"><div class="step-num"></div><div><strong class="hl3">Mesures/attributs</strong> (Measures) — ex: Le temps de réponse</div></div>
+      </div>
+
+      <div class="card accent-g">
+        <div class="card-label">Exemple complet du cours</div>
+        <table style="width:100%;font-size:13px;">
+          <tr><td style="padding:6px 0;color:var(--muted);width:140px;">Caractéristique</td><td style="color:var(--text);">Rendement</td></tr>
+          <tr><td style="padding:6px 0;color:var(--muted);">Sous-caractéristique</td><td style="color:var(--text);">Comportement vis-à-vis du temps — "Capacité du produit logiciel à fournir des temps de réponses, de traitement et des débits appropriés lors de l'exécution de sa fonction, dans des conditions données"</td></tr>
+          <tr><td style="padding:6px 0;color:var(--muted);">Mesure</td><td style="color:var(--text);">Le temps de réponse</td></tr>
+          <tr><td style="padding:6px 0;color:var(--muted);">But de la mesure</td><td style="color:var(--text);">"Combien de temps prend l'exécution d'une tâche ?"</td></tr>
+        </table>
+        <div class="formula">T = A − B<br><span style="font-size:12px;color:var(--muted);">A = temps que prend le système à répondre à la tâche<br>B = temps que prend l'exécution de la tâche</span></div>
+      </div>
+
+      <h3 id="qualite-fonct">Qualité de fonctionnement (Quality in Use) — 5 caractéristiques</h3>
+
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">Effectiveness (Efficacité)</div>
+          <p>"L'exactitude et l'exhaustivité (<em>accuracy and completeness</em>) avec lesquelles les usagers <strong>atteignent les objectifs spécifiés</strong>."</p>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px;">→ L'usager arrive-t-il vraiment à faire ce qu'il voulait faire, complètement et correctement ?</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Efficiency (Efficience)</div>
+          <p>"Les <strong>ressources dépensées</strong> par rapport à l'exactitude et l'exhaustivité avec lesquelles les usagers atteignent leurs objectifs."</p>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px;">→ Combien ça coûte (temps, effort, clics) pour atteindre ce résultat ? Effectiveness = LE résultat ; Efficiency = le RATIO résultat/effort.</p>
+        </div>
+        <div class="card accent-g">
+          <div class="card-label">Satisfaction</div>
+          <p>"Le degré auquel les <strong>besoins des parties prenantes sont satisfaits</strong> lorsqu'un produit est utilisé dans un contexte d'utilisation spécifié."</p>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px;">→ L'aspect subjectif/émotionnel : l'usager est-il content ?</p>
+        </div>
+        <div class="card accent-w">
+          <div class="card-label">Safety (Sûreté de fonctionnement)</div>
+          <p>"Le degré auquel un produit ou système, dans des conditions spécifiées, <strong>ne mène pas à un état où la vie humaine, la santé, la propriété ou l'environnement sont mis en danger</strong>."</p>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px;">→ Critique pour les systèmes embarqués, médicaux, transport.</p>
+        </div>
+        <div class="card accent-d" style="grid-column:1/-1;">
+          <div class="card-label">Context Comprehensiveness (Maîtrise du contexte)</div>
+          <p>"Le degré auquel un produit peut être utilisé avec efficacité, efficience, sûreté et satisfaction, <strong>aussi bien dans les contextes spécifiés que dans des contextes au-delà de ceux initialement identifiés</strong>."</p>
+          <p style="color:var(--muted);font-size:13px;margin-top:6px;">→ Le système reste-t-il utilisable même dans des situations imprévues au départ ? (ex: une appli conçue pour ordinateur qui fonctionne aussi bien sur tablette même si ce n'était pas prévu initialement)</p>
+        </div>
+      </div>
+
+      <h3>Types d'utilisateurs (ISO 25010)</h3>
+      <p>Pour bien évaluer la "Quality in Use", il faut savoir QUI utilise le système. Le cours distingue 3 types :</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type d'usager</th><th>Description</th><th>Exemples</th></tr></thead>
+          <tbody>
+            <tr><td><strong class="hl">Utilisateur primaire</strong></td><td>Interagit directement avec le système pour accomplir sa tâche principale</td><td>Opérateur</td></tr>
+            <tr><td><strong class="hl2">Utilisateurs secondaires</strong></td><td>Fournissent du support au système</td><td>Fournisseur de contenu, gestionnaire système, gestionnaire sécurité, mainteneur, analyste, porteur (porting), installateur</td></tr>
+            <tr><td><strong class="hl3">Utilisateur indirect</strong></td><td>Reçoit la sortie du système mais <strong>n'interagit pas</strong> avec lui</td><td>Une personne qui reçoit un rapport généré automatiquement</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--muted);font-size:14px;">💡 Chaque type d'usager a des besoins différents pour le même critère "Effectiveness" : "Comment l'usager est-il efficace pour réaliser sa tâche ?" se pose différemment pour un opérateur (interaction directe) vs un mainteneur (maintenir/porter le système) vs un utilisateur indirect (utiliser la sortie).</p>
+    </section>
+    <section id="qualite-produit-section" style="border-top:none;padding-top:0;margin-bottom:0;">
+      <h3 id="qualite-produit">Qualité du produit — 8 caractéristiques</h3>
+      <p>C'est la partie la <strong>la plus importante à mémoriser</strong> pour l'examen. Le modèle se compose de 8 caractéristiques, chacune avec ses sous-caractéristiques.</p>
+
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">1 — Aptitude fonctionnelle (Functional Suitability)</div>
+          <p style="font-size:14px;">"La mesure dans laquelle le produit fournit des fonctions qui répondent aux besoins exprimés et implicites lorsque le produit est utilisé dans des conditions spécifiées."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Exhaustivité fonctionnelle</strong> — toutes les fonctions nécessaires sont présentes</li>
+            <li><strong>Exactitude fonctionnelle</strong> — les fonctions donnent des résultats corrects</li>
+            <li><strong>Pertinence fonctionnelle</strong> — les fonctions sont appropriées pour les tâches visées</li>
+          </ul>
+        </div>
+
+        <div class="card accent-p">
+          <div class="card-label">2 — Efficacité du rendement (Performance Efficiency)</div>
+          <p style="font-size:14px;">"La performance relative à la quantité de ressources utilisées dans des conditions déterminées."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Comportement vis-à-vis du temps</strong> — temps de réponse, de traitement, débit</li>
+            <li><strong>Utilisation des ressources</strong> — CPU, mémoire, bande passante consommés</li>
+          </ul>
+        </div>
+
+        <div class="card accent-g">
+          <div class="card-label">3 — Compatibilité</div>
+          <p style="font-size:14px;">"La mesure dans laquelle deux ou plusieurs systèmes ou composants peuvent échanger des informations et/ou exercer les fonctions requises tout en partageant le même matériel ou environnement logiciel."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Co-existence</strong> — fonctionne sans nuire à d'autres logiciels partageant l'environnement</li>
+            <li><strong>Interopérabilité</strong> — échange et utilise efficacement l'information avec d'autres systèmes</li>
+          </ul>
+        </div>
+
+        <div class="card accent-w">
+          <div class="card-label">4 — Facilité d'utilisation (Usability)</div>
+          <p style="font-size:14px;">"La mesure dans laquelle un produit peut être utilisé par les utilisateurs spécifiés pour atteindre les objectifs spécifiés avec efficacité, efficience et satisfaction dans un contexte d'utilisation spécifié."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Pertinence</strong> — l'usager reconnaît si le produit est approprié à ses besoins</li>
+            <li><strong>Facilité d'apprentissage</strong> — facile à apprendre</li>
+            <li><strong>Opérabilité</strong> — facile à utiliser/contrôler</li>
+            <li><strong>Protection de l'utilisateur contre les erreurs</strong></li>
+            <li><strong>Interface utilisateur esthétique</strong></li>
+            <li><strong>Accessibilité</strong> — utilisable par des personnes ayant des limitations (handicaps)</li>
+          </ul>
+        </div>
+
+        <div class="card accent-d">
+          <div class="card-label">5 — Fiabilité (Reliability)</div>
+          <p style="font-size:14px;">"La mesure dans laquelle un système ou composant effectue les fonctions spécifiées dans des conditions spécifiées pour une période de temps spécifiée."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Maturité</strong> — répond aux besoins de fiabilité en fonctionnement normal</li>
+            <li><strong>Disponibilité</strong> — opérationnel et accessible quand requis</li>
+            <li><strong>Tolérance aux pannes</strong> — fonctionne malgré des défaillances matérielles/logicielles</li>
+            <li><strong>Rétablissement (Recoverability)</strong> — récupère les données et rétablit l'état souhaité après une interruption</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-left:3px solid #cbd5e1;">
+          <div class="card-label" style="color:#cbd5e1;">6 — Sécurité (Security)</div>
+          <p style="font-size:14px;">"Le degré auquel les informations et données sont protégées de façon à ce que des personnes ou systèmes non autorisés ne peuvent pas les lire ou les modifier, et les personnes/systèmes autorisés ne se font pas refuser l'accès."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Confidentialité</strong> — seuls les autorisés ont accès aux données</li>
+            <li><strong>Intégrité</strong> — empêche l'accès/modification non autorisés</li>
+            <li><strong>Non-répudiation</strong> — les actions/événements peuvent être prouvés comme s'étant produits</li>
+            <li><strong>Responsabilisation (Accountability)</strong> — les actions d'une entité peuvent être traçables jusqu'à elle</li>
+            <li><strong>Authenticité</strong> — l'identité d'un sujet/ressource est prouvée comme étant ce qu'elle prétend</li>
+          </ul>
+        </div>
+
+        <div class="card accent-l">
+          <div class="card-label">7 — Maintenabilité (Maintainability)</div>
+          <p style="font-size:14px;">"Le degré d'efficience et d'efficacité avec lesquels le produit peut être modifié."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Modularité</strong> — un changement dans un composant a un impact minimal sur les autres</li>
+            <li><strong>Réutilisabilité</strong> — un actif peut être utilisé dans plus d'un système</li>
+            <li><strong>Analysabilité</strong> — facile d'évaluer l'impact d'un changement</li>
+            <li><strong>Modifiabilité</strong> — facile de modifier sans introduire de défauts</li>
+            <li><strong>Testabilité</strong> — facile d'établir des critères de test et de les exécuter</li>
+          </ul>
+        </div>
+
+        <div class="card accent-p">
+          <div class="card-label">8 — Portabilité (Portability)</div>
+          <p style="font-size:14px;">"La mesure dans laquelle un système ou composant peut être effectivement et efficacement transféré d'un matériel, logiciel, ou d'un autre environnement opérationnel ou d'utilisation à un autre."</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);"><strong>Sous-caractéristiques :</strong></p>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:1.8;">
+            <li><strong>Adaptabilité</strong> — peut être adapté à différents environnements</li>
+            <li><strong>Installabilité</strong> — facile à installer/désinstaller</li>
+            <li><strong>Remplaçabilité</strong> — peut remplacer un autre logiciel pour le même usage dans le même environnement</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card accent-g" style="margin-top:16px;">
+        <div class="card-label">🧠 Astuce mnémotechnique</div>
+        <p>Pour mémoriser les 8 caractéristiques, pensez à <strong>"AFCURMPS"</strong> ou créez votre propre phrase :</p>
+        <p style="margin-top:8px;"><strong class="hl">A</strong>ptitude fonctionnelle, <strong class="hl">F</strong>iabilité, <strong class="hl">C</strong>ompatibilité, <strong class="hl">U</strong>tilisabilité (facilité d'utilisation), <strong class="hl">R</strong>endement (efficacité du rendement), <strong class="hl">M</strong>aintenabilité, <strong class="hl">P</strong>ortabilité, <strong class="hl">S</strong>écurité.</p>
+      </div>
+    </section>
+
+    <section id="definition-exigences">
+      <h2 class="section-title"><span class="num">5.3</span> La définition des exigences de qualité du logiciel</h2>
+
+      <p>Une fois les parties prenantes identifiées, les activités menant à la <strong>spécification</strong> du logiciel sont les suivantes (notez que c'est plus détaillé que le cycle élicitation→analyse→spécification→validation vu plus haut — c'est une version raffinée) :</p>
+
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div><strong class="hl">Éliciter (élucider)</strong> — rassembler les souhaits, attentes et besoins des parties prenantes.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong class="hl2">Prioriser</strong> — selon leur importance relative. Voir les 4 méthodes ci-dessous.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong class="hl3">Analyser</strong> — vérifier la cohérence et l'exhaustivité de l'ensemble des exigences.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong class="hlw">Décrire</strong> — écrire les exigences sous une forme aisément compréhensible pour les utilisateurs ET les développeurs.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong class="hld">Spécifier</strong> — transformer les exigences d'affaires en spécification logicielle.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Réviser</strong> — vérifier que les spécifications sont correctes, complètes, claires, uniques, vérifiables, etc.</div></div>
+      </div>
+
+      <h3>4 méthodes de priorisation</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Méthode</th><th>Échelle</th><th>Quand l'utiliser</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Binaire</strong></td><td>Essentielle / Souhaitable</td><td>Tri rapide : "must-have" vs "nice-to-have"</td></tr>
+            <tr><td><strong>Trois niveaux</strong></td><td>Élevée / Moyenne / Faible</td><td>Plus de granularité, le plus courant</td></tr>
+            <tr><td><strong>Matrice importance/urgence</strong></td><td>Important×Urgent / Important×Pas urgent / etc.</td><td>Inspirée de la matrice d'Eisenhower — utile pour gérer un backlog avec des contraintes de temps</td></tr>
+            <tr><td><strong>Valeur/Coût/Risque</strong></td><td>3 dimensions combinées</td><td>Pour des décisions économiques/stratégiques — le ROI (retour sur investissement) influence la priorité</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>L'ensemble des exigences d'un logiciel (slide 42)</h3>
+      <p>Ce diagramme synthétise tout le chapitre. Les <strong>souhaits, attentes et besoins</strong> des parties prenantes se traduisent en <strong>3 grandes catégories</strong> :</p>
+
+      <div class="grid3">
+        <div class="card accent-l">
+          <div class="card-label">Fonctionnelles</div>
+          <p style="font-size:14px;"><strong>"Ce qui doit être exécuté"</strong> — les comportements/actions du système.</p>
+        </div>
+        <div class="card accent-w">
+          <div class="card-label">Contraintes</div>
+          <p style="font-size:14px;"><strong>"Les obligations"</strong> — limites de développement (technologie, normes, etc.)</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Non fonctionnelles</div>
+          <p style="font-size:14px;"><strong>"Les propriétés du système"</strong> — qualités (les 8 caractéristiques ISO 25000)</p>
+        </div>
+      </div>
+
+      <div class="def" style="margin-top:16px;">
+        <strong>🔧 5 techniques d'élicitation des exigences</strong> (qui s'appliquent aux 3 catégories) :
+        <ul style="padding-left:20px;line-height:2;margin-top:8px;">
+          <li><strong>Lecture de documents externes</strong> — RFP, SOW, manuels, documentation de systèmes similaires</li>
+          <li><strong>S'immerger dans le milieu</strong> (observer les usagers dans leur environnement réel)</li>
+          <li><strong>Entrevues (interviews)</strong></li>
+          <li><strong>Comparer aux autres systèmes</strong> (analyse compétitive / benchmark)</li>
+          <li><strong>Brainstorming</strong></li>
+        </ul>
+      </div>
+
+      <h3>Classification des exigences (rappel synthèse)</h3>
+      <div class="card accent-g">
+        <div class="grid3">
+          <div>
+            <strong class="hl">1) Exigences fonctionnelles</strong>
+            <p style="font-size:13px;color:var(--muted);margin-top:6px;">Décrivent les caractéristiques du système ou les processus que le système doit exécuter. Inclut les <em>exigences d'affaires</em> et les <em>exigences fonctionnelles de l'utilisateur</em>.</p>
+          </div>
+          <div>
+            <strong class="hl2">2) Exigences non-fonctionnelles (de qualité)</strong>
+            <p style="font-size:13px;color:var(--muted);margin-top:6px;">Décrivent les propriétés que le système doit avoir — traduites en caractéristiques/sous-caractéristiques ISO 25000 : sécurité, confidentialité, intégrité, disponibilité, performance, accessibilité, etc.</p>
+          </div>
+          <div>
+            <strong class="hl3">3) Contraintes</strong>
+            <p style="font-size:13px;color:var(--muted);margin-top:6px;">Les limites du développement : l'infrastructure sur laquelle le système doit fonctionner, le langage de programmation à utiliser.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="caracteristiques">
+      <h2 class="section-title"><span class="num">✅</span> Caractéristiques recherchées des exigences</h2>
+      <p>Une bonne exigence, individuellement ou dans un ensemble, doit respecter 7 critères :</p>
+
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">1 — Nécessaire</div>
+          <p style="font-size:14px;">Des éléments importants du système que <strong>d'autres composants ne pourraient pas compenser</strong>. Si on peut retirer l'exigence sans rien perdre, elle n'est pas nécessaire.</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">2 — Non ambiguë</div>
+          <p style="font-size:14px;"><strong>Une seule interprétation possible</strong>, par TOUTES les parties prenantes. C'est la cause #3 des mauvaises exigences vue plus haut.</p>
+        </div>
+        <div class="card accent-g">
+          <div class="card-label">3 — Concise</div>
+          <p style="font-size:14px;">Un <strong>langage précis, bref et agréable à lire</strong> — communique l'essence de ce qui est exigé sans verbiage inutile.</p>
+        </div>
+        <div class="card accent-w">
+          <div class="card-label">4 — Cohérente</div>
+          <p style="font-size:14px;">Ne pas <strong>contredire des exigences en amont</strong>, ni être contredite par d'autres exigences. D'un énoncé à l'autre, les termes doivent garder le même sens (vocabulaire/glossaire constant).</p>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">5 — Complète</div>
+          <p style="font-size:14px;">Énoncée <strong>entièrement en un seul endroit</strong>, de façon à ce que le lecteur n'ait pas besoin de chercher dans un autre texte pour comprendre le sens complet de l'exigence.</p>
+        </div>
+        <div class="card" style="border-left:3px solid #cbd5e1;">
+          <div class="card-label" style="color:#cbd5e1;">6 — Accessible (réaliste)</div>
+          <p style="font-size:14px;">Réaliste compte tenu des <strong>moyens disponibles</strong> : argent, ressources, temps. Une exigence impossible à réaliser dans les contraintes du projet n'est pas accessible.</p>
+        </div>
+        <div class="card accent-l" style="grid-column:1/-1;">
+          <div class="card-label">7 — Vérifiable</div>
+          <p style="font-size:14px;">Permet de déterminer si elle a été satisfaite ou non, selon <strong>une de 4 méthodes possibles</strong> :</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+            <span class="exo-tag tag-func" style="padding:6px 14px;">Inspection</span>
+            <span class="exo-tag tag-nonfunc" style="padding:6px 14px;">Analyse</span>
+            <span class="exo-tag tag-affaires" style="padding:6px 14px;">Démonstration</span>
+            <span class="exo-tag tag-contrainte" style="padding:6px 14px;">Test</span>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-top:10px;">Rappel pratique : "L'interface doit être conviviale" (item #1 de l'exercice) échoue ce critère — comment vérifier "convivial" ? Une bonne reformulation serait : "90% des nouveaux usagers doivent réussir à emprunter un livre sans aide en moins de 2 minutes" (vérifiable par test/démonstration).</p>
+        </div>
+      </div>
+    </section>
+    <section id="stm">
+      <h2 class="section-title"><span class="num">🚇</span> Étude de cas : Société de transport de Montréal (STM)</h2>
+
+      <div class="def">
+        <strong>Contexte :</strong> Appel d'offres (RFP) pour un système de vente et de rechargement de cartes à puce (la carte OPUS).
+      </div>
+
+      <p>Voici les exigences non-fonctionnelles du cahier des charges réel, et à quelle caractéristique ISO 25000 elles correspondent :</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Exigence STM</th><th>Caractéristique ISO 25000</th><th>Explication</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Le temps de traitement maximal de chaque échange d'information machine ne doit pas dépasser <strong>1 seconde</strong></td>
+              <td><span class="hl">Efficacité du rendement</span> → Comportement vis-à-vis du temps</td>
+              <td>C'est un temps de réponse, mesurable avec T = A − B</td>
+            </tr>
+            <tr>
+              <td>Le temps de lecture/encodage de la carte ne doit pas dépasser <strong>250 ms</strong></td>
+              <td><span class="hl">Efficacité du rendement</span> → Comportement vis-à-vis du temps</td>
+              <td>Encore un temps de réponse, mais sur une opération matérielle précise</td>
+            </tr>
+            <tr>
+              <td>Le pourcentage de succès de lecture/encodage est de <strong>99.99%</strong></td>
+              <td><span class="hl2">Fiabilité</span> → Maturité</td>
+              <td>Le système répond aux besoins de fiabilité en opération normale presque tout le temps</td>
+            </tr>
+            <tr>
+              <td>Capacité de fonctionner sans connexion au système central pendant <strong>4 jours</strong></td>
+              <td><span class="hl2">Fiabilité</span> → Tolérance aux pannes / Disponibilité</td>
+              <td>Le système continue de fonctionner malgré une panne (perte de connexion)</td>
+            </tr>
+            <tr>
+              <td><strong>Réduire au maximum</strong> le temps de mise hors service de l'équipement de vente</td>
+              <td><span class="hl2">Fiabilité</span> → Disponibilité</td>
+              <td>L'équipement doit être opérationnel et accessible le plus possible</td>
+            </tr>
+            <tr>
+              <td>Possibilité de fonctionner en <strong>mode dégradé</strong></td>
+              <td><span class="hl2">Fiabilité</span> → Tolérance aux pannes</td>
+              <td>Le système continue à offrir un service réduit même en cas de défaillance partielle</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card accent-g">
+        <div class="card-label">💡 Pourquoi cet exemple est important</div>
+        <p>Ce cas démontre concrètement l'idée de la citation d'ouverture du chapitre : pour un système comme la carte OPUS, <strong>aucune de ces 6 exigences n'est fonctionnelle</strong> (elles ne décrivent pas "vendre une carte" ou "recharger un montant"). Pourtant, ce sont elles qui définiront le succès ou l'échec perçu du système par les usagers (millions de personnes/jour) — un système qui prend 5 secondes pour valider une carte au tourniquet, même s'il "fonctionne", serait un échec.</p>
+      </div>
+    </section>
+
+    <section id="excuses">
+      <h2 class="section-title"><span class="num">🙄</span> La liste d'excuses (22 excuses pour ne pas se soucier de la qualité)</h2>
+      <p>Cette section du cours est volontairement provocatrice : elle liste 22 phrases qu'on entend souvent dans l'industrie, qui sont toutes des <strong>excuses pour ignorer la qualité</strong>. Comprendre pourquoi chacune est fausse est un bon exercice de réflexion.</p>
+
+      <div class="grid2">
+        <div class="card accent-d">
+          <div class="card-label">Excuses sur "le client ne s'en soucie pas"</div>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:2;">
+            <li>"Mon client ne s'intéresse qu'au coût et à l'échéancier"</li>
+            <li>"Mon projet n'a pas spécifié d'objectifs de qualité"</li>
+            <li>"Le contrat ne dit rien au sujet de la qualité"</li>
+            <li>"Le client n'est pas intéressé par la qualité, juste par le prix"</li>
+            <li>"On ne doit pas en faire plus que ce qui est demandé dans le contrat"</li>
+          </ul>
+          <p style="margin-top:10px;font-size:13px;"><strong class="hl3">Pourquoi c'est faux :</strong> Comme le dit la citation d'ouverture, les exigences non-fonctionnelles déterminent le succès même si le client ne les a pas explicitement demandées. Le client s'attend implicitement à la qualité — il ne pense juste pas à la mentionner.</p>
+        </div>
+
+        <div class="card accent-w">
+          <div class="card-label">Excuses sur la mesure</div>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:2;">
+            <li>"On ne peut pas mesurer la qualité..."</li>
+            <li>"C'est quoi la qualité... comment mesure-t-on la qualité ?"</li>
+            <li>"La complexité du code n'a rien à voir avec la qualité"</li>
+            <li>"La qualité c'est le nombre de bogues dans le logiciel livré"</li>
+            <li>"On a trouvé 1000 bogues pendant les tests, donc c'est de grande qualité"</li>
+          </ul>
+          <p style="margin-top:10px;font-size:13px;"><strong class="hl3">Pourquoi c'est faux :</strong> L'ISO 25000 fournit justement un cadre complet de mesures (8 caractéristiques, sous-caractéristiques, attributs précis comme T = A − B). 1000 bogues trouvés signifie souvent que le code est de MAUVAISE qualité (forte complexité = plus de bogues potentiels), pas l'inverse.</p>
+        </div>
+
+        <div class="card accent-l">
+          <div class="card-label">Excuses sur le compromis qualité/productivité</div>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:2;">
+            <li>"On ne peut pas avoir une grande productivité ET de la qualité"</li>
+            <li>"Ce n'est pas un logiciel critique (centrale nucléaire/fusée), relaxe"</li>
+            <li>"On met beaucoup de temps à tester donc c'est de qualité"</li>
+            <li>"On n'a plus le temps de tester, il faut livrer"</li>
+            <li>"On va laisser le client trouver les bogues"</li>
+            <li>"Si ça marche pas maintenant, on réparera plus tard chez le client"</li>
+          </ul>
+          <p style="margin-top:10px;font-size:13px;"><strong class="hl3">Pourquoi c'est faux :</strong> Le coût de correction d'un défaut augmente de façon exponentielle plus tard dans le cycle de vie (rappel : courbe d'estimation de la séance 2 — l'incertitude diminue mais le coût d'un changement augmente). "Pas critique" est aussi relatif — une bibliothèque qui perd des données reste un échec pour ses usagers.</p>
+        </div>
+
+        <div class="card accent-p">
+          <div class="card-label">Excuses de "fausse assurance qualité"</div>
+          <ul style="padding-left:18px;font-size:13px;color:var(--muted);line-height:2;">
+            <li>"On fait des audits de processus constamment"</li>
+            <li>"On utilise des normes ISO, donc c'est de qualité"</li>
+            <li>"Les gars de AQ regardent nos documents"</li>
+            <li>"On fait 90% de réutilisation, donc c'est de qualité"</li>
+            <li>"On a un échéancier serré, on n'a pas le temps de faire de revues"</li>
+            <li>"Ça, c'est pas une erreur, c'est un bogue"</li>
+          </ul>
+          <p style="margin-top:10px;font-size:13px;"><strong class="hl3">Pourquoi c'est faux :</strong> Suivre un processus (audits, normes, AQ) ne garantit pas le résultat — c'est une condition nécessaire mais pas suffisante. Réutiliser du code de mauvaise qualité propage les défauts. Et "erreur" vs "bogue" est juste de la sémantique pour éviter d'admettre un problème.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="facteurs">
+      <h2 class="section-title"><span class="num">🎯</span> Facteurs de succès et d'échec</h2>
+
+      <div class="grid2">
+        <div class="card accent-g">
+          <div class="card-label">✅ Facteurs qui favorisent la qualité</div>
+          <ul style="padding-left:18px;font-size:14px;color:var(--muted);line-height:2.2;">
+            <li>Une <strong>bonne compréhension de la qualité non-fonctionnelle</strong> (le cœur de ce chapitre !)</li>
+            <li>Un bon processus de <strong>définition, suivi et communication</strong> des exigences qualité</li>
+            <li><strong>Évaluer la qualité tout au long du cycle de vie</strong> (pas juste à la fin)</li>
+            <li>Établir la <strong>criticité du logiciel</strong> AVANT de démarrer le projet</li>
+            <li>Utiliser les avantages de la <strong>traçabilité</strong> du logiciel</li>
+          </ul>
+        </div>
+        <div class="card accent-d">
+          <div class="card-label">❌ Facteurs qui nuisent à la qualité</div>
+          <ul style="padding-left:18px;font-size:14px;color:var(--muted);line-height:2.2;">
+            <li><strong>Ne pas prendre en compte</strong> les exigences qualité</li>
+            <li><strong>Ne pas tenir compte de la criticité</strong> du logiciel</li>
+            <li><strong>Croire aux excuses</strong> de la liste précédente</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="def" style="margin-top:16px;">
+        <strong>🔗 Qu'est-ce que la "traçabilité du logiciel" ?</strong><br>
+        C'est la capacité de <strong>suivre le lien entre une exigence et tous les artefacts qui en découlent</strong> (code, tests, documentation). Si l'exigence #7 de l'exercice ("le système ne doit pas permettre la visualisation des infos personnelles") change, la traçabilité permet de savoir immédiatement : quelle(s) ligne(s) de code implémente(nt) cette règle, quel(s) test(s) la vérifient, et quel(s) document(s) la décrivent. C'est listé dans les "bonnes pratiques de gestion des exigences" de Wiegers ("Maintenir une matrice de traçabilité").
+      </div>
+    </section>
+
+    <section id="etudes-cas">
+      <h2 class="section-title"><span class="num">📑</span> Études de cas — Réponses guidées</h2>
+
+      <h3>Cas I — Le "baseline" des exigences</h3>
+      <div class="card accent-l">
+        <p><strong>Question :</strong> La fin de la phase de développement des exigences est marquée par l'accord des différentes parties prenantes autour d'un document baseline. Que représente le "baseline" et que signifie cet accord, pour chaque groupe ?</p>
+      </div>
+
+      <div class="def">
+        <strong>📌 Un "baseline" (référentiel)</strong> est une <strong>version figée et officiellement approuvée</strong> d'un document d'exigences — un point de référence stable à partir duquel tout changement futur devra être formellement géré (via le processus de contrôle des changements de Wiegers). Avant le baseline, les exigences peuvent évoluer librement ; après, tout changement nécessite une analyse d'impact.
+      </div>
+
+      <div class="grid2">
+        <div class="card accent-l">
+          <div class="card-label">Pour les clients</div>
+          <p style="font-size:14px;">Le baseline représente <strong>l'engagement formel sur ce qui sera livré</strong>. C'est l'accord que "voici ce que vous obtiendrez" — leurs exigences sont fixées, et tout ajout futur passera par un processus de changement (potentiellement avec impact sur coût/délai).</p>
+        </div>
+        <div class="card accent-p">
+          <div class="card-label">Pour les développeurs</div>
+          <p style="font-size:14px;">Le baseline représente <strong>la cible stable à construire</strong>. Ils peuvent planifier, estimer, et concevoir l'architecture en sachant que le périmètre ne changera pas sous leurs pieds sans discussion formelle. C'est ce qui permet d'éviter le "requirements creep" non contrôlé.</p>
+        </div>
+        <div class="card accent-g">
+          <div class="card-label">Pour les testeurs</div>
+          <p style="font-size:14px;">Le baseline représente <strong>la référence pour créer les critères d'acceptation et les cas de test</strong>. Ils peuvent commencer à concevoir leurs scénarios de test en parallèle du développement, en s'appuyant sur des exigences qui ne changeront pas.</p>
+        </div>
+        <div class="card accent-w">
+          <div class="card-label">Pour les gestionnaires/décideurs</div>
+          <p style="font-size:14px;">Le baseline représente <strong>la base pour l'estimation finale du budget, de l'échéancier et des ressources</strong> (rappel séance 2 : le degré de précision des estimations augmente après les exigences). C'est aussi le point de référence pour mesurer l'avancement et gérer les écarts ("requirements creep" = écart par rapport au baseline).</p>
+        </div>
+      </div>
+
+      <h3>Cas II — Assurer l'alignement</h3>
+      <div class="card accent-l">
+        <p><strong>Question :</strong> Comment s'assurer de l'alignement entre exigences d'affaires, exigences usagers, et exigences fonctionnelles ?</p>
+      </div>
+
+      <div class="card accent-g">
+        <p>Voici une démarche complète, basée sur les concepts du chapitre :</p>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div><strong>Traçabilité bidirectionnelle (forward & backward)</strong> — chaque exigence fonctionnelle doit pouvoir "remonter" vers au moins une exigence usager, qui doit elle-même "remonter" vers au moins un objectif d'affaires. Et inversement : chaque objectif d'affaires doit avoir au moins une exigence fonctionnelle qui contribue à l'atteindre.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Matrice de traçabilité</strong> — un tableau (outil de gestion des exigences de Wiegers) qui mappe explicitement : Exigence d'affaires → Exigence usager → Exigence fonctionnelle → Code → Test. Tout "trou" dans cette matrice révèle un désalignement.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Revues croisées avec les bonnes parties prenantes</strong> — impliquer à la fois le "client" (porteur des objectifs d'affaires) ET les "usagers" (porteurs des besoins fonctionnels) dans la revue des exigences fonctionnelles, pour vérifier les deux niveaux d'alignement simultanément.</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Vérifier la "Pertinence fonctionnelle"</strong> (sous-caractéristique de l'Aptitude fonctionnelle ISO 25000) — chaque fonction doit être appropriée pour les tâches/objectifs visés, pas juste "techniquement correcte".</div></div>
+          <div class="step"><div class="step-num"></div><div><strong>Document de Vision & Portée comme pivot</strong> (slide 12) — ce document fait le lien entre exigences d'affaires et exigences usagers, et doit être révisé/approuvé par les deux groupes.</div></div>
+        </div>
+      </div>
+
+      <h3>Cas III — Gestion d'une nouvelle exigence dans un carnet "baseliné" (Agile)</h3>
+      <div class="card accent-l">
+        <p><strong>Question :</strong> En mode agile, sprint 1 de 5, le carnet de produit (Product Backlog) est BASELINED. Le Product Owner (PO) propose d'ajouter une nouvelle exigence au carnet baseliné parce qu'il la juge importante pour les objectifs d'affaires. Comment gérer cela en tant que gestionnaire de projet ?</p>
+      </div>
+
+      <div class="card accent-w">
+        <div class="card-label">⚠️ Le conflit central</div>
+        <p>Le PO confond deux choses : <strong>l'agilité du backlog (qui peut toujours évoluer entre les sprints)</strong> versus <strong>le baseline du sprint en cours (le contenu du Sprint 1, déjà engagé avec l'équipe)</strong>. En Scrum/Agile, le carnet de produit (Product Backlog) reste vivant et évolutif par nature — mais le <strong>Sprint Backlog</strong> (ce qui est engagé pour le sprint en cours) est, lui, protégé contre les changements pendant le sprint.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div><strong>Clarifier où se situe l'exigence</strong> — Est-ce que le PO veut l'ajouter au <em>Sprint 1 en cours</em> (problème !) ou au <em>backlog global pour un sprint futur</em> (normal, c'est même le rôle du PO de faire évoluer le backlog) ?</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Si c'est pour le Sprint 1 en cours :</strong> appliquer le principe agile que le contenu d'un sprint en cours ne change pas. Refuser poliment, expliquer que cela perturberait l'engagement de l'équipe et la prévisibilité de la vélocité (rappel : "en mode Agile, l'équipe est plutôt fixée pour chaque itération" — séance 2, slide 45).</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Évaluer l'urgence réelle :</strong> Si l'exigence est vraiment critique (ex: bloquant pour les objectifs d'affaires), discuter avec l'équipe d'un <em>arrêt de sprint</em> (sprint abandonment) — une option formelle en Scrum, mais coûteuse et exceptionnelle.</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Ajouter au Product Backlog (global)</strong> pour priorisation lors du prochain Sprint Planning. Le PO peut prioriser cette exigence très haut pour le Sprint 2, en suivant la technique de priorisation appropriée (valeur/coût/risque — section 5.3).</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Documenter via le processus de contrôle des changements</strong> (bonne pratique de Wiegers en "Gestion des exigences") — même en Agile, un changement de cap mérite d'être enregistré pour la traçabilité et l'analyse d'impact (sur le budget global, l'échéancier des 5 sprints, etc.)</div></div>
+        <div class="step"><div class="step-num"></div><div><strong>Communiquer à toute l'équipe (Comité de projet, séance 2)</strong> — la décision finale et sa justification, pour maintenir la transparence et éviter la frustration.</div></div>
+      </div>
+    </section>
+    <section id="quiz">
+      <h2 class="section-title"><span class="num">🎯</span> Questions susceptibles d'être à l'examen</h2>
+      <p style="margin-bottom:24px;">Cliquez sur chaque question pour révéler la réponse.</p>
+
+      <div class="quiz-section">
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q1</span> Quelle est la différence fondamentale entre une exigence fonctionnelle et une exigence non-fonctionnelle ? Donnez un exemple de chaque pour un même système.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>Une <strong>exigence fonctionnelle</strong> décrit <em>CE QUE</em> le système doit faire (le comportement requis), formulée avec "shall/DOIT". Une <strong>exigence non-fonctionnelle</strong> décrit <em>COMMENT</em> le système doit le faire (une contrainte de conception/qualité).</p>
+            <p style="margin-top:10px;"><strong>Exemple (système de bibliothèque) :</strong></p>
+            <ul style="padding-left:20px;line-height:2;margin-top:6px;">
+              <li><strong>Fonctionnelle :</strong> "Le système permet aux clients de réserver des documents"</li>
+              <li><strong>Non-fonctionnelle :</strong> "Le temps d'enregistrement d'une réservation ne doit pas dépasser 3 secondes"</li>
+            </ul>
+            <p style="margin-top:10px;">La citation d'ouverture du chapitre (Robert Charette) rappelle que dans les systèmes réels, c'est souvent la <strong>seconde</strong> catégorie qui déterminera le succès ou l'échec perçu.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q2</span> Décrivez les 4 étapes du processus de développement des exigences et l'activité principale de chacune.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <ol style="padding-left:20px;line-height:2.2;margin-top:8px;">
+              <li><strong>Élicitation</strong> — identifier les parties prenantes et classes d'usagers, comprendre leurs tâches et objectifs, le contexte d'utilisation, et leurs besoins fonctionnels/qualité.</li>
+              <li><strong>Analyse</strong> — traduire les exigences usager en spécifications du logiciel : vue externe (comportement, fonctionnalités, interfaces) et conception (comment réaliser).</li>
+              <li><strong>Spécification</strong> — mettre en forme les exigences sous forme de documents/diagrammes compréhensibles, séparant exigences fonctionnelles et non-fonctionnelles.</li>
+              <li><strong>Validation</strong> — réviser les exigences pour corriger les problèmes, et développer les tests/critères d'acceptation avant transmission au développement.</li>
+            </ol>
+            <p style="margin-top:10px;">Important : ce n'est pas un processus strictement linéaire — à chaque étape, on peut devoir clarifier, ré-écrire, ré-évaluer ou compléter (boucle itérative).</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q3</span> Le modèle de qualité ISO/IEC 25000 se compose de 3 grands modèles. Lesquels, et que mesure chacun ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <ol style="padding-left:20px;line-height:2.2;margin-top:8px;">
+              <li><strong>Qualité de fonctionnement (Quality in Use)</strong> — évalue la qualité du point de vue de l'utilisateur final dans son contexte réel d'utilisation (5 caractéristiques : Effectiveness, Efficiency, Satisfaction, Safety, Context Comprehensiveness).</li>
+              <li><strong>Qualité du produit</strong> — évalue les propriétés intrinsèques du logiciel lui-même (8 caractéristiques : Aptitude fonctionnelle, Efficacité du rendement, Compatibilité, Facilité d'utilisation, Fiabilité, Sécurité, Maintenabilité, Portabilité).</li>
+              <li><strong>Qualité des données</strong> — évalue la qualité des données manipulées par le système.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q4</span> Nommez les 8 caractéristiques de la "Qualité du produit" selon ISO/IEC 25000, avec une définition courte pour chacune.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <ol style="padding-left:20px;line-height:2.4;margin-top:8px;">
+              <li><strong>Aptitude fonctionnelle</strong> — le produit fournit des fonctions qui répondent aux besoins, dans des conditions spécifiées.</li>
+              <li><strong>Efficacité du rendement</strong> — la performance relative à la quantité de ressources utilisées.</li>
+              <li><strong>Compatibilité</strong> — capacité d'échanger des informations et fonctionner avec d'autres systèmes/environnements partagés.</li>
+              <li><strong>Facilité d'utilisation</strong> — utilisable par les usagers spécifiés pour atteindre leurs objectifs avec efficacité, efficience et satisfaction.</li>
+              <li><strong>Fiabilité</strong> — effectue les fonctions spécifiées dans des conditions et une période de temps spécifiées.</li>
+              <li><strong>Sécurité</strong> — protection des données contre accès/modification non autorisés, sans refuser l'accès aux autorisés.</li>
+              <li><strong>Maintenabilité</strong> — degré d'efficience/efficacité avec lesquels le produit peut être modifié.</li>
+              <li><strong>Portabilité</strong> — capacité d'être transféré d'un environnement matériel/logiciel/opérationnel à un autre.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q5</span> Donnez l'exemple complet du cours sur "le temps de réponse" en montrant les 4 niveaux du modèle de qualité ISO 25000 (caractéristique → sous-caractéristique → mesure → formule).</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <table style="width:100%;font-size:14px;">
+              <tr><td style="padding:8px 0;color:var(--muted);width:160px;">Caractéristique</td><td><strong class="hl">Efficacité du rendement (Performance Efficiency)</strong></td></tr>
+              <tr><td style="padding:8px 0;color:var(--muted);">Sous-caractéristique</td><td><strong class="hl2">Comportement vis-à-vis du temps</strong> — capacité du produit logiciel à fournir des temps de réponses, de traitement et des débits appropriés lors de l'exécution de sa fonction, dans des conditions données</td></tr>
+              <tr><td style="padding:8px 0;color:var(--muted);">Mesure</td><td><strong class="hl3">Le temps de réponse</strong> — but : combien de temps prend l'exécution d'une tâche ?</td></tr>
+              <tr><td style="padding:8px 0;color:var(--muted);">Formule</td><td><strong>T = A − B</strong> où A = temps que prend le système à répondre à la tâche, B = temps que prend l'exécution de la tâche</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q6</span> Classez et justifiez la classification des exigences suivantes : (a) "Le système doit être implémenté en C# avec .NET" et (b) "Le système doit s'interfacer avec le système de paie externe".</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>(a) "Le système doit être implémentée en C# avec .NET"</strong> → <strong class="hlw">Contrainte</strong>. Ceci impose une technologie/langage de programmation spécifique, ce qui est explicitement défini comme une "contrainte" dans le cours : "les limites du développement : le langage de programmation qui doit être utilisé".</p>
+            <p style="margin-top:10px;"><strong>(b) "Le système doit s'interfacer avec le système de paie externe"</strong> → <strong class="hld">Exigence d'interface externe</strong>. Ceci décrit une connexion explicite vers un système externe pour échanger des données, catégorie distincte mentionnée dans le diagramme "Exigences de qualité" (slide 12), alimentant directement le Document de Spécifications des Exigences Logicielles (SEL).</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q7</span> Quelles sont les 4 causes principales de "mauvaises exigences" identifiées dans le cours ? Pour chacune, proposez une solution.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <ol style="padding-left:20px;line-height:2.4;margin-top:8px;">
+              <li><strong>Faible implication des usagers</strong> (faute partagée analystes/clients/gestionnaires) → Solution : sélectionner des "champions" produit (bonne pratique de Wiegers) et impliquer directement les classes d'usagers via entrevues/observations.</li>
+              <li><strong>Requirements creep</strong> (dérive incontrôlée des exigences) → Solution : bien définir le Document de Vision & Portée (slide 12) avec inclusions/exclusions explicites, dès le début (rappel séance 2 : "les limites du projet").</li>
+              <li><strong>Exigences ambiguës</strong> (peu détaillées ou termes vagues) → Solution : appliquer les 7 critères de qualité des exigences, particulièrement "Non ambiguë" et "Vérifiable" (inspection/analyse/démonstration/test).</li>
+              <li><strong>Intervenant négligé</strong> (classe d'usagers absente ou expert de contenu manquant) → Solution : utiliser la taxonomie complète des parties prenantes (équipe projet / organisation / externe) pour systématiquement vérifier qu'aucun groupe n'est oublié.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q8</span> Qu'est-ce que l'alignement des exigences, et pourquoi est-ce important ? Comment l'assurer concrètement ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>L'alignement</strong> est la cohérence entre 3 niveaux : exigences d'affaires (pourquoi), exigences usagers (qui a besoin de quoi), et exigences fonctionnelles (que doit faire le système techniquement).</p>
+            <p style="margin-top:10px;"><strong>Pourquoi c'est important :</strong> sans alignement, on peut développer des fonctionnalités qui ne servent à aucun objectif d'affaires (gaspillage), ou avoir des objectifs d'affaires qu'aucune fonctionnalité ne réalise (échec stratégique).</p>
+            <p style="margin-top:10px;"><strong>Comment l'assurer :</strong> via une matrice de traçabilité bidirectionnelle (outil de Wiegers) qui relie chaque niveau, des revues croisées impliquant client ET usagers, et le Document de Vision & Portée comme pivot.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q9</span> Citez les 7 critères de qualité que doit respecter une bonne exigence, et expliquez "Vérifiable" en détail.</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>7 critères :</strong> Nécessaire, Non ambiguë, Concise, Cohérente, Complète, Accessible, Vérifiable.</p>
+            <p style="margin-top:10px;"><strong>"Vérifiable"</strong> signifie qu'on peut déterminer objectivement si l'exigence a été satisfaite ou non, via une de 4 méthodes :</p>
+            <ul style="padding-left:20px;line-height:2;margin-top:6px;">
+              <li><strong>Inspection</strong> — revue visuelle/manuelle</li>
+              <li><strong>Analyse</strong> — calcul ou raisonnement (ex: analyse de code statique)</li>
+              <li><strong>Démonstration</strong> — montrer le système en action</li>
+              <li><strong>Test</strong> — exécution avec résultats mesurables</li>
+            </ul>
+            <p style="margin-top:10px;">Exemple : "Le système doit avoir une interface conviviale" n'est PAS vérifiable telle quelle (ambiguë). "90% des nouveaux usagers réussissent une tâche donnée en moins de 2 minutes" EST vérifiable par test.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q10</span> Qu'est-ce qu'un "baseline" d'exigences et que signifie-t-il pour les 4 groupes de parties prenantes (clients, développeurs, testeurs, gestionnaires) ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p>Un <strong>baseline</strong> est une version figée et officiellement approuvée du document d'exigences — un point de référence stable où tout changement futur nécessite un processus formel de contrôle des changements.</p>
+            <ul style="padding-left:20px;line-height:2.2;margin-top:8px;">
+              <li><strong class="hl">Clients :</strong> représente l'engagement formel sur ce qui sera livré</li>
+              <li><strong class="hl2">Développeurs :</strong> représente la cible stable pour planifier, estimer et concevoir</li>
+              <li><strong class="hl3">Testeurs :</strong> représente la référence pour créer les critères d'acceptation et cas de test</li>
+              <li><strong class="hlw">Gestionnaires :</strong> représente la base pour estimer budget/échéancier/ressources et mesurer les écarts</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q11</span> Selon l'ISO 25010, quels sont les 3 types d'utilisateurs et leur différence ? Pourquoi cette distinction est-elle importante pour la "Qualité de fonctionnement" ?</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <ul style="padding-left:20px;line-height:2.2;margin-top:8px;">
+              <li><strong class="hl">Utilisateur primaire</strong> — interagit directement avec le système pour sa tâche principale (ex: opérateur).</li>
+              <li><strong class="hl2">Utilisateurs secondaires</strong> — fournissent du support (fournisseur de contenu, gestionnaire système/sécurité, mainteneur, analyste, porteur, installateur).</li>
+              <li><strong class="hl3">Utilisateur indirect</strong> — reçoit la sortie du système sans interagir avec lui.</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>Pourquoi c'est important :</strong> chaque caractéristique de "Quality in Use" (ex: Effectiveness) se pose DIFFÉREMMENT selon le type d'usager. "L'efficacité" pour un opérateur (utiliser le système pour sa tâche) n'est pas la même chose que pour un mainteneur (maintenir/porter le système) ou un usager indirect (utiliser la sortie). Si on n'évalue la qualité que pour les utilisateurs primaires, on rate les besoins des autres groupes — risque de "mauvaises exigences" (Cause 4 : intervenant négligé).</p>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="quiz-q" onclick="toggleQuiz(this)">
+            <span><span class="qnum">Q12 — Bonus difficile</span> En vous basant sur le cas STM (carte OPUS), identifiez à quelle(s) caractéristique(s) ISO 25000 correspondent les exigences suivantes : "le pourcentage de succès de lecture est de 99.99%" et "le système doit pouvoir fonctionner sans connexion centrale pendant 4 jours".</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="quiz-a">
+            <p><strong>"99.99% de succès de lecture/encodage"</strong> → <strong class="hl2">Fiabilité</strong>, sous-caractéristique <strong>Maturité</strong> : le système répond aux besoins de fiabilité en fonctionnement normal — un taux de succès très élevé indique que le système accomplit ses fonctions de manière fiable presque tout le temps.</p>
+            <p style="margin-top:10px;"><strong>"Fonctionner sans connexion centrale pendant 4 jours"</strong> → <strong class="hl2">Fiabilité</strong>, sous-caractéristiques <strong>Tolérance aux pannes</strong> (le système continue de fonctionner malgré une défaillance — la perte de connexion) ET <strong>Disponibilité</strong> (le système reste opérationnel et accessible malgré l'absence de connexion).</p>
+            <p style="margin-top:10px;color:var(--muted);font-size:13px;">Note : ces deux exigences pourraient aussi avoir une composante "Sécurité" si l'absence de connexion implique des décisions de validation locales (ex: accepter une carte sans vérification centrale pendant ces 4 jours) — mais le focus principal du cours est sur la Fiabilité pour ces deux items.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+function toggleQuiz(el) {
+  el.classList.toggle('open');
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('show');
+}
+</script>
+
+</body>
+</html>
